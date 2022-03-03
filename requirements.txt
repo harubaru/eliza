@@ -1,0 +1,2 @@
+tweepy
+git+https://github.com/hitomi-team/shimeji
