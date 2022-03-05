@@ -1,6 +1,6 @@
 from core.args import parse, config, get_model_provider
 from core.logging import get_logger
-from client.bot import TerminalBot
+from client.bot import TerminalBot, TwitterBot
 
 import sys
 import asyncio
@@ -14,6 +14,18 @@ def main():
         model_provider = get_model_provider(chatbot_config)
         if chatbot_config['client'] == 'terminal':
             bot = TerminalBot(name=chatbot_config['name'], model_provider=model_provider)
+            bot.run()
+        elif chatbot_config['client'] == 'twitter':
+            bot = TwitterBot(
+                name=chatbot_config['name'],
+                model_provider=model_provider,
+                bearer_token=chatbot_config['client_args']['bearer_token'],
+                consumer_key=chatbot_config['client_args']['consumer_key'],
+                consumer_secret=chatbot_config['client_args']['consumer_secret'],
+                access_token=chatbot_config['client_args']['access_token'],
+                access_token_secret=chatbot_config['client_args']['access_token_secret'],
+                username=chatbot_config['client_args']['username']
+            )
             bot.run()
         else:
             raise Exception('unsupported client')
