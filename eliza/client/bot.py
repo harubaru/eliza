@@ -1,3 +1,4 @@
+import regex
 from shimeji import ChatBot
 from shimeji.preprocessor import ContextPreprocessor
 from shimeji.postprocessor import NewlinePrunerPostprocessor
@@ -90,6 +91,15 @@ class TwitterBot(Bot):
         else:
             self.client_api.create_tweet(text=text)
     
+    def flatten(self, arr):
+        rt = []
+        for i in arr:
+            if isinstance(i, list):
+                rt.extend(self.flatten(i))
+            else:
+                rt.append(i)
+        return rt
+
     # return a list of strings that are the conversational history of a tweet
     def get_conversation(self, id):
         conversation = []
@@ -102,14 +112,21 @@ class TwitterBot(Bot):
         if 'tweets' in tweet.includes:
             for tweet_id in tweet.includes['tweets']:
                 # prepend parent tweet to conversation, since get_conversation returns an array, expand it
-                conversation.insert(0, self.get_conversation(tweet_id.id)[0])
+                conversation.insert(0, self.get_conversation(tweet_id.id))
         
-        return conversation
+        return self.flatten(conversation)
     
     # on_tweet: check if tweet is in reply to bot, if it is, get the conversation and respond
     def on_tweet(self, tweet):
         logger.info(f'Tweet received: {tweet.id}')
         conversation = self.get_conversation(tweet.id)
+
+        # replace @username with nothing
+        for i in range(len(conversation)):
+            conversation[i] = conversation[i].replace(f'@{self.kwargs["username"]} ', '')
+            conversation[i] = regex.sub(r'@[^ ]*', '', conversation[i])
+            conversation[i] = regex.sub(' +', ' ', conversation[i])
+        
         response = self.chatbot.respond('\n'.join(conversation), push_chain=False)
         self.tweet(response, reply_to=tweet.id)
 
