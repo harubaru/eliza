@@ -118,7 +118,7 @@ class TwitterBot(Bot):
         
         for user in tweet.includes['users']:
             author = user['name']
-        
+
         conversation.append(f"{author}: {tweet.data.text}")
         if 'tweets' in tweet.includes:
             for tweet_id in tweet.includes['tweets']:
@@ -131,6 +131,9 @@ class TwitterBot(Bot):
     def on_tweet(self, tweet):
         logger.info(f'Tweet received: {tweet.id}')
         conversation = self.get_conversation(tweet.id)
+        #check if last tweet is from bot
+        if conversation[-1].startswith(self.name):
+            return
 
         # replace @username with nothing
         for i in range(len(conversation)):
@@ -142,18 +145,16 @@ class TwitterBot(Bot):
         self.tweet(response, reply_to=tweet.id)
 
     async def loop_tweet(self):
+        asyncio.set_event_loop(asyncio.new_event_loop())
         while True:
             logger.info('Tweeting...')
             self.initial_tweet()
             await asyncio.sleep(900)
 
     def run(self):
-        # create a loop that runs initial_tweet on 30 minute intervals
-        self.loop = asyncio.get_event_loop()
-        self.loop.create_task(self.loop_tweet())
-        self.loop.run_forever()
-
-        self.client.filter(expansions=self.expansions, user_fields=self.user_fields)
+        # create a task that runs loop_tweet in a separate thread by creating a new event loop
+        self.client.filter(expansions=self.expansions, user_fields=self.user_fields, threaded=True)
+        asyncio.run(self.loop_tweet())
 
     def close(self):
         for task in asyncio.Task.all_tasks():

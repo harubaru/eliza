@@ -32,12 +32,15 @@ def main():
             raise Exception('unsupported client')
     except KeyboardInterrupt:
         print('Exiting...')
+        bot.close()
         sys.exit(0)
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())
+        bot.close()
         sys.exit(1)
     finally:
+        bot.close()
         sys.exit(0)
 
 if __name__ == '__main__':
