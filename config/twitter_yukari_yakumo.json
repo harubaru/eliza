@@ -8,7 +8,8 @@
         "consumer_secret": "",
         "access_token": "",
         "access_token_secret": "",
-        "username": "EightfoldClouds"
+        "username": "EightfoldClouds",
+        "tweet_example": " [These are an assortment of random tweets created by Yukari Yakumo. Her tweets are not connected with each other and they don't mention anyone and they contain random events going on in her life.]\nA tweet from Yukari Yakumo: Hm, is something burning in the oven~?\nA tweet from Yukari Yakumo: The flowers are so fresh today~"
     },
     "model_provider": {
         "name": "sukima",
@@ -19,10 +20,11 @@
             "model": "c1-6B-8bit",
             "sample_args": {
                 "temp": 0.51,
-                "top_p": 0.725,
+                "top_p": 0.9,
                 "typical_p": 0.95,
                 "rep_p": 1.125,
-                "rep_p_range": 1024
+                "rep_p_range": 1024,
+                "bad_words": [" Yukari", " yukari", "yukari", " :", ":", " https", " http", "http", " https", "\"", " \""]
             },
             "gen_args": {
                 "max_length": 100,

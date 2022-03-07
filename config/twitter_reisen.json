@@ -1,0 +1,54 @@
+{
+    "name": "Reisen Udongein Inaba",
+    "prompt": " [Reisen Udongein Inaba is an emotionally distant and jaded Moon Rabbit who has been through a cruel amount of suffering in the past. Her master, Eirin Yagokoro, offers her a place to live in exchange for work at Eientei. She has her be the purple-haired bunny girl that delivers and sells medicine at the Human Village. She does not wish to talk much about her past as it upsets her, plus she is very timid around humans.]\n\n",
+    "client": "twitter",
+    "client_args": {
+        "bearer_token": "",
+        "consumer_key": "",
+        "consumer_secret": "",
+        "access_token": "",
+        "access_token_secret": "",
+        "username": "LunaticUdongein",
+        "tweet_example": " [These are an assortment of random tweets created by Reisen Udongein Inaba. Her tweets are not connected with each other and they don't mention anyone and they contain random events going on in her life.]\nA tweet from Reisen Udongein Inaba: W-Why are humans so stinky?!\nA tweet from Reisen Udongein Inaba: It's so rainy today... ;~;"
+    },
+    "model_provider": {
+        "name": "sukima",
+        "endpoint": "http://192.168.0.147:8000",
+        "username": "username",
+        "password": "password",
+        "gensettings": {
+            "model": "c1-6B-8bit",
+            "sample_args": {
+                "temp": 0.51,
+                "top_p": 0.725,
+                "typical_p": 0.95,
+                "rep_p": 1.115,
+                "rep_p_range": 1024,
+                "bad_words": ["~", " ~", " Reisen", " reisen", "reisen", " :", ":","https", " http", "http", " https", "\"", " \""],
+                "logit_biases": [
+                    {
+                        "id": 13557,
+                        "bias": -0.15
+                    },
+                    {
+                        "id": 3228,
+                        "bias": -0.05
+                    }
+                ],
+                "phrase_biases": [
+                    {
+                        "sequences": ["._.", " ._."],
+                        "bias": -0.15,
+                        "ensure_sequence_finish": false,
+                        "generate_once": false
+                    }
+                ]
+            },
+            "gen_args": {
+                "max_length": 100,
+                "min_length": 1,
+                "eos_token_id": 198
+            }
+        }
+    }
+}

@@ -1,3 +1,4 @@
+import asyncio
 import regex
 from shimeji import ChatBot
 from shimeji.preprocessor import ContextPreprocessor
@@ -53,7 +54,8 @@ class TwitterBot(Bot):
         )
 
         self.client = tweepy.StreamingClient(
-            bearer_token=self.kwargs['bearer_token']
+            bearer_token=self.kwargs['bearer_token'],
+            wait_on_rate_limit=True
         )
 
         self.auth = tweepy.OAuthHandler(
@@ -91,6 +93,15 @@ class TwitterBot(Bot):
         else:
             self.client_api.create_tweet(text=text)
     
+    def initial_tweet(self):
+        mp = self.model_provider
+        args = mp.kwargs['args']
+        args.prompt = f'{self.kwargs["tweet_example"]}\nA tweet from {self.name}:'
+        args.gen_args.eos_token_id = 198
+        args.gen_args.min_length = 1
+        response = mp.generate(args).rstrip('\n')
+        self.tweet(response)
+
     def flatten(self, arr):
         rt = []
         for i in arr:
@@ -130,5 +141,21 @@ class TwitterBot(Bot):
         response = self.chatbot.respond('\n'.join(conversation), push_chain=False)
         self.tweet(response, reply_to=tweet.id)
 
+    async def loop_tweet(self):
+        while True:
+            logger.info('Tweeting...')
+            self.initial_tweet()
+            await asyncio.sleep(900)
+
     def run(self):
+        # create a loop that runs initial_tweet on 30 minute intervals
+        self.loop = asyncio.get_event_loop()
+        self.loop.create_task(self.loop_tweet())
+        self.loop.run_forever()
+
         self.client.filter(expansions=self.expansions, user_fields=self.user_fields)
+
+    def close(self):
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
+    

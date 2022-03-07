@@ -24,7 +24,8 @@ def main():
                 consumer_secret=chatbot_config['client_args']['consumer_secret'],
                 access_token=chatbot_config['client_args']['access_token'],
                 access_token_secret=chatbot_config['client_args']['access_token_secret'],
-                username=chatbot_config['client_args']['username']
+                username=chatbot_config['client_args']['username'],
+                tweet_example=chatbot_config['client_args']['tweet_example']
             )
             bot.run()
         else:

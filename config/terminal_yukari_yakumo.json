@@ -11,7 +11,7 @@
             "model": "c1-6B-8bit",
             "sample_args": {
                 "temp": 0.51,
-                "top_p": 0.725,
+                "top_p": 0.9,
                 "typical_p": 0.95,
                 "rep_p": 1.125,
                 "rep_p_range": 1024
