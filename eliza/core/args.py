@@ -38,6 +38,7 @@ def get_model_provider(args):
             min_length=get_item(args["model_provider"]["gensettings"]["gen_args"], "min_length"),
             eos_token_id=get_item(args["model_provider"]["gensettings"]["gen_args"], "eos_token_id"),
             logprobs=get_item(args["model_provider"]["gensettings"]["gen_args"], "logprobs"),
+            best_of=get_item(args["model_provider"]["gensettings"]["gen_args"], "best_of"),
         )
         # logit biases are an array in args['model_provider']['gensettings']['logit_biases']
         logit_biases = None
