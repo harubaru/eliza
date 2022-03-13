@@ -3,12 +3,13 @@ from core.logging import get_logger
 from client.bot import TerminalBot, TwitterBot, DiscordBot
 
 import sys
-import asyncio
 import traceback
 
 logger = get_logger(__name__)
 
 def main():
+    logger.info('Initializing ELIZA...')
+
     chatbot_config = config(parse())
     bot = None
     try:
@@ -23,7 +24,8 @@ def main():
                 bearer_token=chatbot_config['client_args']['bearer_token'],
                 priority_channel=chatbot_config['client_args']['priority_channel'],
                 conditional_response=chatbot_config['client_args']['conditional_response'],
-                nicknames=chatbot_config['client_args']['nicknames']
+                nicknames=chatbot_config['client_args']['nicknames'],
+                status=chatbot_config['client_args']['status']
             )
             bot.run()
         elif chatbot_config['client'] == 'twitter':

@@ -6,10 +6,11 @@ from shimeji import ChatBot
 from shimeji.preprocessor import ContextPreprocessor
 from shimeji.postprocessor import NewlinePrunerPostprocessor
 
-from core.logging import get_logger
-
 import tweepy
 import discord
+
+import logging
+from core.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -46,17 +47,42 @@ class TerminalBot(Bot):
 class DiscordBot(Bot):
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
+
+        logging.getLogger('discord').disabled = True
+
+        activity = None
+        status = self.kwargs['status']
+        if status['type'] == 'playing':
+            activity = discord.Activity(
+                type=discord.ActivityType.playing,
+                name=status['text']
+            )
+        elif status['type'] == 'listening':
+            activity = discord.Activity(
+                type=discord.ActivityType.listening,
+                name=status['text']
+            )
+        elif status['type'] == 'watching':
+            activity = discord.Activity(
+                type=discord.ActivityType.watching,
+                name=status['text']
+            )        
+
         intents = discord.Intents().all()
-        self.client = discord.Client(intents=intents)
+
+        self.client = discord.Client(intents=intents, activity=activity, status=discord.Status.online)
+
         self.chatbot = ChatBot(
             name=self.name,
             model_provider=self.model_provider,
-            preprocessors=[ContextPreprocessor()],
+            preprocessors=[ContextPreprocessor(1024-100)],
             postprocessors=[NewlinePrunerPostprocessor()]
         )
+
+        self.debounce = False
     
     async def get_msg_ctx(self, channel):
-        messages = await channel.history(limit=80).flatten()
+        messages = await channel.history(limit=40).flatten()
         chain = []
         for message in reversed(messages):
             if not message.embeds and message.content:
@@ -82,7 +108,12 @@ class DiscordBot(Bot):
         await message.channel.send(response)
     
     async def on_message(self, message):
-        logger.info(f'Received message - ID: {message.id}')
+        if self.debounce:
+            logger.info(f'Debouncing message - ID: {message.id}')
+            return
+        else:
+            logger.info(f'Processing message - ID: {message.id}')
+            self.debounce = True
         try:
             if message.channel.id != self.kwargs['priority_channel']:
                 return
@@ -105,7 +136,9 @@ class DiscordBot(Bot):
                 title='Error',
                 description=str(f'``{e}``')
             )
-            await message.channel.send_message(embed=embed)
+            await message.channel.send(embed=embed)
+        finally:
+            self.debounce = False
 
     def run(self):
         logger.info(f'Starting Discord Bot.')
@@ -238,5 +271,8 @@ class TwitterBot(Bot):
 
     def close(self):
         for task in asyncio.Task.all_tasks():
-            task.cancel()
+            try:
+                task.cancel()
+            except Exception:
+                pass
     
