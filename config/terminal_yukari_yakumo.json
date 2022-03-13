@@ -14,12 +14,19 @@
                 "top_p": 0.9,
                 "typical_p": 0.95,
                 "rep_p": 1.125,
-                "rep_p_range": 1024
+                "rep_p_range": 1024,
+                "logit_biases": [
+                    {
+                        "id": 93,
+                        "bias": 0.15
+                    }
+                ]
             },
             "gen_args": {
                 "max_length": 100,
                 "min_length": 1,
-                "eos_token_id": 198
+                "eos_token_id": 198,
+                "best_of": 8
             }
         }
     }

@@ -10,9 +10,9 @@
         "gensettings": {
             "model": "c1-6B-8bit",
             "sample_args": {
-                "temp": 0.51,
-                "top_p": 0.725,
-                "typical_p": 0.95,
+                "temp": 0.5,
+                "top_p": 0.6,
+                "typical_p": 0.4,
                 "rep_p": 1.115,
                 "rep_p_range": 1024,
                 "bad_words": ["~", " ~", " Reisen", " reisen", "reisen"],
@@ -38,7 +38,8 @@
             "gen_args": {
                 "max_length": 100,
                 "min_length": 1,
-                "eos_token_id": 198
+                "eos_token_id": 198,
+                "best_of": 4
             }
         }
     }
