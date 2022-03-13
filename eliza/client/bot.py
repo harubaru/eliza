@@ -1,3 +1,5 @@
+import re
+import traceback
 import asyncio
 import regex
 from shimeji import ChatBot
@@ -7,6 +9,7 @@ from shimeji.postprocessor import NewlinePrunerPostprocessor
 from core.logging import get_logger
 
 import tweepy
+import discord
 
 logger = get_logger(__name__)
 
@@ -39,6 +42,79 @@ class TerminalBot(Bot):
             except KeyboardInterrupt:
                 print('Exiting...')
                 break
+
+class DiscordBot(Bot):
+    def __init__(self, name, **kwargs):
+        super().__init__(name, **kwargs)
+        intents = discord.Intents().all()
+        self.client = discord.Client(intents=intents)
+        self.chatbot = ChatBot(
+            name=self.name,
+            model_provider=self.model_provider,
+            preprocessors=[ContextPreprocessor()],
+            postprocessors=[NewlinePrunerPostprocessor()]
+        )
+    
+    async def get_msg_ctx(self, channel):
+        messages = await channel.history(limit=80).flatten()
+        chain = []
+        for message in reversed(messages):
+            if not message.embeds and message.content:
+                content = re.sub(r'\<[^>]*\>', '', message.content)
+                if content != '':
+                    chain.append(f'{message.author.name}: {content}')
+                continue
+            elif message.embeds:
+                content = message.embeds[0].description
+                if content != '':
+                    chain.append(f'{message.author.name}: [Embed: {content}]')
+                continue
+            elif message.attachments:
+                chain.append(f'{message.author.name}: [Image attached]')
+        return '\n'.join(chain)
+
+    async def on_ready(self):
+        logger.info(f'Connected to Discord - ID: {self.client.user.id} - Name: {self.client.user.name}')
+    
+    async def respond(self, conversation, message):
+        async with message.channel.typing():
+            response = self.chatbot.respond(conversation, push_chain=False)
+        await message.channel.send(response)
+    
+    async def on_message(self, message):
+        logger.info(f'Received message - ID: {message.id}')
+        try:
+            if message.channel.id != self.kwargs['priority_channel']:
+                return
+            if message.author.id == self.client.user.id:
+                return
+            
+            conversation = await self.get_msg_ctx(message.channel)
+
+            if self.kwargs['conditional_response'] == True:
+                if self.client.user.mentioned_in(message) or any(t in message.content.lower() for t in self.kwargs['nicknames']):
+                    await self.respond(conversation, message)
+                elif self.chatbot.should_respond(conversation, push_chain=False):
+                    await self.respond(conversation, message)
+            else:
+                await self.respond(conversation, message)
+        except Exception as e:
+            logger.error(e)
+            logger.error(traceback.format_exc())
+            embed = discord.Embed(
+                title='Error',
+                description=str(f'``{e}``')
+            )
+            await message.channel.send_message(embed=embed)
+
+    def run(self):
+        logger.info(f'Starting Discord Bot.')
+        self.on_ready = self.client.event(self.on_ready)
+        self.on_message = self.client.event(self.on_message)
+        self.client.run(self.kwargs['bearer_token'])
+    
+    def close(self):
+        asyncio.run(self.client.close())
 
 class TwitterBot(Bot):
     def __init__(self, name, model_provider, **kwargs):

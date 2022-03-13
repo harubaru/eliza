@@ -1,6 +1,6 @@
 from core.args import parse, config, get_model_provider
 from core.logging import get_logger
-from client.bot import TerminalBot, TwitterBot
+from client.bot import TerminalBot, TwitterBot, DiscordBot
 
 import sys
 import asyncio
@@ -15,6 +15,16 @@ def main():
         model_provider = get_model_provider(chatbot_config)
         if chatbot_config['client'] == 'terminal':
             bot = TerminalBot(name=chatbot_config['name'], model_provider=model_provider)
+            bot.run()
+        elif chatbot_config['client'] == 'discord':
+            bot = DiscordBot(
+                name=chatbot_config['name'],
+                model_provider=model_provider,
+                bearer_token=chatbot_config['client_args']['bearer_token'],
+                priority_channel=chatbot_config['client_args']['priority_channel'],
+                conditional_response=chatbot_config['client_args']['conditional_response'],
+                nicknames=chatbot_config['client_args']['nicknames']
+            )
             bot.run()
         elif chatbot_config['client'] == 'twitter':
             bot = TwitterBot(
