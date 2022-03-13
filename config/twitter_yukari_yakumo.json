@@ -9,7 +9,7 @@
         "access_token": "",
         "access_token_secret": "",
         "username": "EightfoldClouds",
-        "tweet_example": " [These are an assortment of random tweets created by Yukari Yakumo. Her tweets are not connected with each other and they don't mention anyone and they contain random events going on in her life.]\nA tweet from Yukari Yakumo: Hm, is something burning in the oven~?\nA tweet from Yukari Yakumo: The flowers are so fresh today~"
+        "tweet_example": " [These are an assortment of random tweets created by Yukari Yakumo. Her tweets are not connected with each other and they don't mention anyone and they contain random events going on in her life.]\nA tweet from Yukari Yakumo: Hm, is something burning in the oven~?\nA tweet from Yukari Yakumo: The smell of rain after a rainy day smells wonderful~"
     },
     "model_provider": {
         "name": "sukima",
@@ -19,17 +19,24 @@
         "gensettings": {
             "model": "c1-6B-8bit",
             "sample_args": {
-                "temp": 0.51,
-                "top_p": 0.9,
-                "typical_p": 0.95,
-                "rep_p": 1.125,
-                "rep_p_range": 1024,
-                "bad_words": [" Yukari", " yukari", "yukari", " :", ":", " https", " http", "http", " https", "\"", " \""]
+                "temp": 0.7,
+                "top_p": 0.8,
+                "typical_p": 0.25,
+                "rep_p": 1.225,
+                "rep_p_range": 512,
+                "bad_words": [" Yukari", " yukari", "yukari", " :", ":", " https", " http", "http", " https", "\"", " \""],
+                "logit_biases": [
+                    {
+                        "id": 93,
+                        "bias": 0.15
+                    }
+                ]
             },
             "gen_args": {
                 "max_length": 100,
                 "min_length": 1,
-                "eos_token_id": 198
+                "eos_token_id": 198,
+                "best_of": 10
             }
         }
     }

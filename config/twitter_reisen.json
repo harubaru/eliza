@@ -9,7 +9,7 @@
         "access_token": "",
         "access_token_secret": "",
         "username": "LunaticUdongein",
-        "tweet_example": " [These are an assortment of random tweets created by Reisen Udongein Inaba. Her tweets are not connected with each other and they don't mention anyone and they contain random events going on in her life.]\nA tweet from Reisen Udongein Inaba: W-Why are humans so stinky?!\nA tweet from Reisen Udongein Inaba: It's so rainy today... ;~;"
+        "tweet_example": " [These are an assortment of random tweets created by Reisen Udongein Inaba. Her tweets are not connected with each other and they don't mention anyone and they contain random events going on in her life.]\nA tweet from Reisen Udongein Inaba: W-Why are humans so stinky?!\nA tweet from Reisen Udongein Inaba: I'm so sleepy today... ;~;"
     },
     "model_provider": {
         "name": "sukima",
@@ -19,9 +19,9 @@
         "gensettings": {
             "model": "c1-6B-8bit",
             "sample_args": {
-                "temp": 0.51,
-                "top_p": 0.725,
-                "typical_p": 0.95,
+                "temp": 0.5,
+                "top_p": 0.6,
+                "typical_p": 0.4,
                 "rep_p": 1.115,
                 "rep_p_range": 1024,
                 "bad_words": ["~", " ~", " Reisen", " reisen", "reisen", " :", ":","https", " http", "http", " https", "\"", " \""],
@@ -47,7 +47,8 @@
             "gen_args": {
                 "max_length": 100,
                 "min_length": 1,
-                "eos_token_id": 198
+                "eos_token_id": 198,
+                "best_of": 6
             }
         }
     }
