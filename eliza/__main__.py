@@ -10,6 +10,7 @@ logger = get_logger(__name__)
 
 def main():
     chatbot_config = config(parse())
+    bot = None
     try:
         model_provider = get_model_provider(chatbot_config)
         if chatbot_config['client'] == 'terminal':

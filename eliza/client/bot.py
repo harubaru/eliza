@@ -97,7 +97,7 @@ class TwitterBot(Bot):
         mp = self.model_provider
         args = mp.kwargs['args']
         args.prompt = f'{self.kwargs["tweet_example"]}\nA tweet from {self.name}:'
-        args.sample_args.temp = 0.85
+        args.sample_args.temp = 0.6
         args.gen_args.eos_token_id = 198
         args.gen_args.min_length = 1
         response = mp.generate(args).rstrip('\n')
@@ -148,8 +148,11 @@ class TwitterBot(Bot):
     async def loop_tweet(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
         while True:
-            logger.info('Tweeting...')
-            self.initial_tweet()
+            try:
+                logger.info('Tweeting...')
+                self.initial_tweet()
+            except Exception:
+                logger.info('Failed to tweet... Sleeping.')
             await asyncio.sleep(3600)
 
     def run(self):
