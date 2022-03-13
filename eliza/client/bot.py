@@ -173,7 +173,7 @@ class TwitterBot(Bot):
         mp = self.model_provider
         args = mp.kwargs['args']
         args.prompt = f'{self.kwargs["tweet_example"]}\nA tweet from {self.name}:'
-        args.sample_args.temp = 0.6
+        args.sample_args.temp = 0.85
         args.gen_args.eos_token_id = 198
         args.gen_args.min_length = 1
         response = mp.generate(args).rstrip('\n')
