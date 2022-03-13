@@ -1,18 +1,18 @@
 {
-    "name": "Reisen Udongein Inaba",
-    "prompt": " [Reisen Udongein Inaba is an emotionally distant and jaded Moon Rabbit who has been through a cruel amount of suffering in the past. Her master, Eirin Yagokoro, offers her a place to live in exchange for work at Eientei. She has her be the purple-haired bunny girl that delivers and sells medicine at the Human Village. She does not wish to talk much about her past as it upsets her, plus she is very timid around humans. She stutters a lot like this: H-Help me..]\n\n",
+    "name": "Ran Yakumo",
+    "prompt": " [Ran Yakumo is kitsune and shikigami of Yukari. She is peaceful and gentle. Her shikigami is Chen who loves spending her time with Ran. She performs domestic duties for Yukari and does maintenance on Great Hakurei Barrier. Ran has short blonde hair and nine fox tails.]\n\n",
     "client": "discord",
     "client_args": {
-        "bearer_token": "",
+        "bearer_token": "ODIyNTExNjMwNDE5NzU1MDc5.YFTVpg.52Kxs7t0myjr6BCwzvax82qQuGc",
         "priority_channel": 930561058144411649,
         "conditional_response": true,
         "nicknames": [
-            "reisen",
-            "udonge"
+            " ran",
+            "ran "
         ],
         "status": {
-            "type": "playing",
-            "text": "with the rabbits. 🐰"
+            "type": "listening",
+            "text": "Chen playing~"
         }
     },
     "model_provider": {
@@ -25,10 +25,9 @@
             "sample_args": {
                 "temp": 0.6,
                 "top_p": 0.9,
-                "tfs": 0.9,
                 "rep_p": 1.115,
                 "rep_p_range": 1024,
-                "bad_words": ["~", " ~", " Reisen", " reisen", "reisen"],
+                "bad_words": ["~", " ~", " Ran", " ran", "ran"],
                 "logit_biases": [
                     {
                         "id": 13557,
@@ -52,7 +51,7 @@
                 "max_length": 100,
                 "min_length": 1,
                 "eos_token_id": 198,
-                "best_of": 4
+                "best_of": 3
             }
         }
     }
