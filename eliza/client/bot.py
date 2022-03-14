@@ -104,7 +104,7 @@ class DiscordBot(Bot):
     
     async def respond(self, conversation, message):
         async with message.channel.typing():
-            response = self.chatbot.respond(conversation, push_chain=False)
+            response = await self.chatbot.respond_async(conversation, push_chain=False)
         await message.channel.send(response)
     
     async def on_message(self, message):
@@ -125,7 +125,7 @@ class DiscordBot(Bot):
             if self.kwargs['conditional_response'] == True:
                 if self.client.user.mentioned_in(message) or any(t in message.content.lower() for t in self.kwargs['nicknames']):
                     await self.respond(conversation, message)
-                elif self.chatbot.should_respond(conversation, push_chain=False):
+                elif await self.chatbot.should_respond_async(conversation, push_chain=False):
                     await self.respond(conversation, message)
             else:
                 await self.respond(conversation, message)
