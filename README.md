@@ -45,4 +45,4 @@ Then finally, to run the chatbot, all you would need to do is to run this comman
 
 ### Any questions? Come hop on by to our Discord server!
 
-![Discord Server](https://discordapp.com/api/guilds/930499730843250783/widget.png?style=banner2)
+[![Discord Server](https://discordapp.com/api/guilds/930499730843250783/widget.png?style=banner2)](https://discord.gg/Sx6Spmsgx7)
