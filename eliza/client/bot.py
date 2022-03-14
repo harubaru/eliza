@@ -2,12 +2,14 @@ import re
 import traceback
 import asyncio
 import regex
+import datetime
 from shimeji import ChatBot
 from shimeji.preprocessor import ContextPreprocessor
 from shimeji.postprocessor import NewlinePrunerPostprocessor
 
 import tweepy
 import discord
+from discord.ext import tasks
 
 import logging
 from core.logging import get_logger
@@ -139,11 +141,31 @@ class DiscordBot(Bot):
             await message.channel.send(embed=embed)
         finally:
             self.debounce = False
+    
+    @tasks.loop(seconds=30)
+    async def idle_loop(self):
+        await self.client.wait_until_ready()
+        # get last message in priority channel
+        channel = self.client.get_channel(int(self.kwargs['priority_channel']))
+        message = await channel.history(limit=1).flatten()
+        # check if message author is bot
+        if message[0].author.id == self.client.user.id:
+            return
+        if (datetime.datetime.now(datetime.timezone.utc) - message[0].created_at).total_seconds() >= self.kwargs['idle_messaging_interval']:
+            # if it's been more than 5 minutes, send a response
+            conversation = await self.get_msg_ctx(channel)
+            await self.respond(conversation, message[0])
+            logger.info(f'Processed idle response - ID: {message[0].id}')
 
     def run(self):
         logger.info(f'Starting Discord Bot.')
         self.on_ready = self.client.event(self.on_ready)
         self.on_message = self.client.event(self.on_message)
+
+        if self.kwargs['idle_messaging']:
+            logger.info('Starting idle messaging loop.')
+            self.idle_loop.start()
+
         self.client.run(self.kwargs['bearer_token'])
     
     def close(self):

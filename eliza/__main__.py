@@ -24,6 +24,8 @@ def main():
                 bearer_token=chatbot_config['client_args']['bearer_token'],
                 priority_channel=chatbot_config['client_args']['priority_channel'],
                 conditional_response=chatbot_config['client_args']['conditional_response'],
+                idle_messaging=chatbot_config['client_args']['idle_messaging'],
+                idle_messaging_interval=chatbot_config['client_args']['idle_messaging_interval'],
                 nicknames=chatbot_config['client_args']['nicknames'],
                 status=chatbot_config['client_args']['status']
             )
