@@ -6,6 +6,8 @@
         "bearer_token": "",
         "priority_channel": 930561058144411649,
         "conditional_response": true,
+        "idle_messaging": true,
+        "idle_messaging_interval": 100,
         "nicknames": [
             "yukari",
             "hag"
@@ -23,12 +25,12 @@
         "gensettings": {
             "model": "c1-6B-8bit",
             "sample_args": {
-                "temp": 0.7,
+                "temp": 0.65,
                 "top_p": 0.8,
-                "typical_p": 0.25,
+                "tfs": 0.9,
                 "rep_p": 1.225,
                 "rep_p_range": 512,
-                "bad_words": [" Yukari", " yukari", "yukari", " :", ":", " https", " http", "http", " https", "\"", " \""],
+                "bad_words": [" Yukari", " yukari", "yukari", " :", ":", " https", " http", "http", " https", "\"", " \"", " [", "[", "-", "!", "!!", "!!!"],
                 "logit_biases": [
                     {
                         "id": 93,
@@ -37,7 +39,7 @@
                 ]
             },
             "gen_args": {
-                "max_length": 100,
+                "max_length": 50,
                 "min_length": 1,
                 "eos_token_id": 198,
                 "best_of": 10

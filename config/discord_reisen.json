@@ -6,6 +6,8 @@
         "bearer_token": "",
         "priority_channel": 930561058144411649,
         "conditional_response": true,
+        "idle_messaging": true,
+        "idle_messaging_interval": 100,
         "nicknames": [
             "reisen",
             "udonge"

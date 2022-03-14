@@ -6,6 +6,8 @@
         "bearer_token": "",
         "priority_channel": 930561058144411649,
         "conditional_response": true,
+        "idle_messaging": true,
+        "idle_messaging_interval": 500,
         "nicknames": [
             "eiki",
             "shiki",
@@ -29,7 +31,7 @@
                 "typical_p": 0.98,
                 "rep_p": 1.125,
                 "rep_p_range": 2048,
-                "bad_words": ["~", " ~", " Eiki", " eiki", "Eiki", "eiki"]
+                "bad_words": ["~", " ~", " Eiki", " eiki", "Eiki", "eiki", "!", " :", ":", " https", " http", "http", " https", "\"", " \"", " [", "["]
             },
             "gen_args": {
                 "max_length": 100,
