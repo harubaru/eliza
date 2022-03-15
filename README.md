@@ -40,6 +40,11 @@ Then finally, to run the chatbot, all you would need to do is to run this comman
 
 ![image](https://user-images.githubusercontent.com/26317155/157097205-032cd4c3-008b-4d32-97f5-2b480d7530ca.png)
 
+Or if you're running one of the configurations for a discord bot...
+
+![image](https://user-images.githubusercontent.com/26317155/158450037-7d61a010-0a54-4757-9b60-e7bc1a2bcc20.png)
+
+
 ### License
 [GNU Public License version 2.0](LICENSE)
 
