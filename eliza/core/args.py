@@ -18,8 +18,8 @@ def parse():
     return parser.parse_args()
 
 def config(args):
-    with open(args.config) as f:
-        return json.load(f, encoding='utf-8')
+    with open(args.config, encoding='utf-8') as f:
+        return json.load(f)
 
 def get_item(obj, key):
     if key in obj:
