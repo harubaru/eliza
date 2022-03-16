@@ -19,7 +19,7 @@ def parse():
 
 def config(args):
     with open(args.config) as f:
-        return json.load(f)
+        return json.load(f, encoding='utf-8')
 
 def get_item(obj, key):
     if key in obj:
