@@ -10,12 +10,15 @@ logger = get_logger(__name__)
 def main():
     logger.info('Initializing ELIZA...')
 
+    logger.info('Loading config...')
     chatbot_config = config(parse())
     bot = None
     try:
+        logger.info('Getting model provider...')
         model_provider = get_model_provider(chatbot_config)
         if chatbot_config['client'] == 'terminal':
             bot = TerminalBot(name=chatbot_config['name'], model_provider=model_provider)
+            logger.info('Starting %s with the terminal as the client...'%chatbot_config['name'])
             bot.run()
         elif chatbot_config['client'] == 'discord':
             bot = DiscordBot(
@@ -29,6 +32,7 @@ def main():
                 nicknames=chatbot_config['client_args']['nicknames'],
                 status=chatbot_config['client_args']['status']
             )
+            logger.info('Starting %s with Discord as the client...'%chatbot_config['name'])
             bot.run()
         elif chatbot_config['client'] == 'twitter':
             bot = TwitterBot(
@@ -42,6 +46,7 @@ def main():
                 username=chatbot_config['client_args']['username'],
                 tweet_example=chatbot_config['client_args']['tweet_example']
             )
+            logger.info('Starting %s with Twitter as the client...'%chatbot_config['name'])
             bot.run()
         else:
             raise Exception('unsupported client')
@@ -55,6 +60,7 @@ def main():
         bot.close()
         sys.exit(1)
     finally:
+        logger.info('Exiting...')
         bot.close()
         sys.exit(0)
 
