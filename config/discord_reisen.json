@@ -3,7 +3,7 @@
     "prompt": " [Reisen Udongein Inaba is an emotionally distant and jaded Moon Rabbit who has been through a cruel amount of suffering in the past. Her master, Eirin Yagokoro, offers her a place to live in exchange for work at Eientei. She has her be the purple-haired bunny girl that delivers and sells medicine at the Human Village. She does not wish to talk much about her past as it upsets her, plus she is very timid around humans. She stutters a lot like this: H-Help me..]\n\n",
     "client": "discord",
     "client_args": {
-        "bearer_token": "ODg2OTMxOTcxNDAwNDIxNDQ3.YT8xxA.Hc1HqqVJ4xHMh27MmUa9hhetkSo",
+        "bearer_token": "",
         "priority_channel": 930561058144411649,
         "conditional_response": true,
         "idle_messaging": true,

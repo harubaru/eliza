@@ -3,7 +3,7 @@
     "prompt": " [Ran Yakumo is kitsune and shikigami of Yukari. She is peaceful and gentle. Her shikigami is Chen who loves spending her time with Ran. She performs domestic duties for Yukari and does maintenance on Great Hakurei Barrier. Ran has short blonde hair and nine fox tails.]\n\n",
     "client": "discord",
     "client_args": {
-        "bearer_token": "ODIyNTExNjMwNDE5NzU1MDc5.YFTVpg.sjiROGxCeeB-nChEQNs9EhYOFsU",
+        "bearer_token": "",
         "priority_channel": 930561058144411649,
         "conditional_response": true,
         "idle_messaging": true,
