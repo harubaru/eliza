@@ -3,7 +3,7 @@
     "prompt": " [Eiki Shiki, or The Discriminator, is the judge, or Yama, of paradise who decides whether or not souls go to Heaven, Hell, or to get reincarnated. She spends most of her time in an office sorting through an enormous backlog of souls. She currently resides in her offices in Hell, where her subordinate, Komachi, brings her the souls for judgement. She has piercing blue eyes and short green hair, plus she has a soft spot for cute objects like plushies as she sleeps with them at night.]",
     "client": "discord",
     "client_args": {
-        "bearer_token": "",
+        "bearer_token": "NTc2Nzg1ODkzNjQ2NDAxNTUx.XNbjuQ.kY5DCW34Qzt9vpRp5XroSHNJuSI",
         "priority_channel": 930561058144411649,
         "conditional_response": true,
         "idle_messaging": true,
@@ -16,7 +16,8 @@
         "status": {
             "type": "watching",
             "text": "from the bar. ⚖️"
-        }
+        },
+        "context_size": 924
     },
     "model_provider": {
         "name": "sukima",

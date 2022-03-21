@@ -77,7 +77,7 @@ class DiscordBot(Bot):
         self.chatbot = ChatBot(
             name=self.name,
             model_provider=self.model_provider,
-            preprocessors=[ContextPreprocessor(1024-100)],
+            preprocessors=[ContextPreprocessor(self.kwargs['context_size'])],
             postprocessors=[NewlinePrunerPostprocessor()]
         )
 
@@ -136,7 +136,7 @@ class DiscordBot(Bot):
             logger.error(traceback.format_exc())
             embed = discord.Embed(
                 title='Error',
-                description=str(f'``{e}``')
+                description=str(f'Exception Type: ``{repr(e)}``\Traceback: ``{traceback.format_exc()}``'),
             )
             await message.channel.send(embed=embed)
         finally:

@@ -30,7 +30,8 @@ def main():
                 idle_messaging=chatbot_config['client_args']['idle_messaging'],
                 idle_messaging_interval=chatbot_config['client_args']['idle_messaging_interval'],
                 nicknames=chatbot_config['client_args']['nicknames'],
-                status=chatbot_config['client_args']['status']
+                status=chatbot_config['client_args']['status'],
+                context_size=chatbot_config['client_args']['context_size']
             )
             logger.info('Starting %s with Discord as the client...'%chatbot_config['name'])
             bot.run()

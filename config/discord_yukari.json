@@ -15,7 +15,8 @@
         "status": {
             "type": "playing",
             "text": "with gaps~ 👁️"
-        }
+        },
+        "context_size": 924
     },
     "model_provider": {
         "name": "sukima",
@@ -29,13 +30,17 @@
                 "top_p": 0.8,
                 "tfs": 0.9,
                 "rep_p": 1.225,
-                "rep_p_range": 512,
-                "bad_words": [" Yukari", " yukari", "yukari", " :", ":", " https", " http", "http", " https", "\"", " \"", " [", "[", "-", "!", "!!", "!!!"],
+                "rep_p_range": 1024,
+                "bad_words": [" Yukari", " yukari", "yukari", " :", ":", " https", " http", "http", " https", "\"", " \"", " [", "[", "-", "!", "!!", "!!!", " @", " Deleted User"],
                 "logit_biases": [
                     {
                         "id": 93,
                         "bias": 0.15
-                    }
+                    },
+		    {
+			"id": 198,
+			"bias": 0.15
+		    }
                 ]
             },
             "gen_args": {
