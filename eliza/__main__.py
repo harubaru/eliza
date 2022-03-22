@@ -7,6 +7,14 @@ import traceback
 
 logger = get_logger(__name__)
 
+def get_key(dictionary, key, required=True, default=None):
+    if key in dictionary:
+        return dictionary[key]
+    elif required:
+        raise Exception(f'{key} is required')
+    else:
+        return default
+
 def main():
     logger.info('Initializing ELIZA...')
 
@@ -24,14 +32,14 @@ def main():
             bot = DiscordBot(
                 name=chatbot_config['name'],
                 model_provider=model_provider,
-                bearer_token=chatbot_config['client_args']['bearer_token'],
-                priority_channel=chatbot_config['client_args']['priority_channel'],
-                conditional_response=chatbot_config['client_args']['conditional_response'],
-                idle_messaging=chatbot_config['client_args']['idle_messaging'],
-                idle_messaging_interval=chatbot_config['client_args']['idle_messaging_interval'],
-                nicknames=chatbot_config['client_args']['nicknames'],
-                status=chatbot_config['client_args']['status'],
-                context_size=chatbot_config['client_args']['context_size']
+                bearer_token=get_key(chatbot_config['client_args'], 'bearer_token'),
+                priority_channel=get_key(chatbot_config['client_args'], 'priority_channel'),
+                conditional_response=get_key(chatbot_config['client_args'], 'conditional_response', required=False, default=True),
+                idle_messaging=get_key(chatbot_config['client_args'], 'idle_messaging', required=False, default=False),
+                idle_messaging_interval=get_key(chatbot_config['client_args'], 'idle_messaging_interval', required=False, default=100),
+                nicknames=get_key(chatbot_config['client_args'], 'nicknames'),
+                status=get_key(chatbot_config['client_args'], 'status', required=False, default=None),
+                context_size=get_key(chatbot_config['client_args'], 'context_size', required=False, default=924),
             )
             logger.info('Starting %s with Discord as the client...'%chatbot_config['name'])
             bot.run()
