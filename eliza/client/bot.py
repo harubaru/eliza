@@ -1,3 +1,4 @@
+import random
 import re
 import traceback
 import asyncio
@@ -83,6 +84,14 @@ class DiscordBot(Bot):
 
         self.debounce = False
     
+    def get_priority_channel(self, priority_channels):
+        if isinstance(priority_channels, list):
+            return priority_channels
+        elif isinstance(priority_channels, int):
+            return [priority_channels]
+        else:
+            raise Exception(f'Invalid priority channel type: {type(priority_channels)}')
+    
     async def get_msg_ctx(self, channel):
         messages = await channel.history(limit=40).flatten()
         chain = []
@@ -110,6 +119,12 @@ class DiscordBot(Bot):
         await message.channel.send(response)
     
     async def on_message(self, message):
+        priority_channels = self.get_priority_channel(self.kwargs['priority_channel'])
+        if message.channel.id not in priority_channels:
+            return
+        if message.author.id == self.client.user.id:
+            return
+
         if self.debounce:
             logger.info(f'Debouncing message - ID: {message.id}')
             return
@@ -117,11 +132,6 @@ class DiscordBot(Bot):
             logger.info(f'Processing message - ID: {message.id}')
             self.debounce = True
         try:
-            if message.channel.id != self.kwargs['priority_channel']:
-                return
-            if message.author.id == self.client.user.id:
-                return
-            
             conversation = await self.get_msg_ctx(message.channel)
 
             if self.kwargs['conditional_response'] == True:
@@ -145,8 +155,9 @@ class DiscordBot(Bot):
     @tasks.loop(seconds=30)
     async def idle_loop(self):
         await self.client.wait_until_ready()
-        # get last message in priority channel
-        channel = self.client.get_channel(int(self.kwargs['priority_channel']))
+        # get last message in a random priority channel
+        priority_channels = self.get_priority_channel(self.kwargs['priority_channel'])
+        channel = self.client.get_channel(random.choice(priority_channels))
         message = await channel.history(limit=1).flatten()
         # check if message author is bot
         if message[0].author.id == self.client.user.id:
