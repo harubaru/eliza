@@ -151,7 +151,7 @@ class DiscordBot(Bot):
             logger.error(traceback.format_exc())
             embed = discord.Embed(
                 title='Error',
-                description=str(f'Exception Type: ``{repr(e)}``\Traceback: ``{traceback.format_exc()}``'),
+                description=str(f'Exception Type: ``{repr(e)}``\nTraceback: ``{traceback.format_exc()}``'),
             )
             await message.channel.send(embed=embed)
         finally:
