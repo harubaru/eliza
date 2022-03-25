@@ -14,6 +14,7 @@ from discord.ext import tasks
 
 import logging
 from core.logging import get_logger
+from core.utils import cut_trailing_sentence
 
 logger = get_logger(__name__)
 
@@ -116,6 +117,7 @@ class DiscordBot(Bot):
     async def respond(self, conversation, message):
         async with message.channel.typing():
             response = await self.chatbot.respond_async(conversation, push_chain=False)
+            response = cut_trailing_sentence(response)
         await message.channel.send(response)
     
     async def on_message(self, message):
