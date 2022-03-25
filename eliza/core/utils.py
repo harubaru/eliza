@@ -1,3 +1,16 @@
+from difflib import SequenceMatcher
+
+def anti_spam(messages, threshold=0.8):
+    to_remove = []
+    for i in range(len(messages)):
+        for j in range(i+1, len(messages)):
+            if i != j:
+                if SequenceMatcher(None, messages[i].content, messages[j].content).ratio() > threshold:
+                    to_remove.append(j)
+    to_remove = list(set(to_remove))
+    messages = [messages[i] for i in range(len(messages)) if i not in to_remove]
+    return messages, len(to_remove)
+
 def standardize_punctuation(text):
     text = text.replace("’", "'")
     text = text.replace("`", "'")

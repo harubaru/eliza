@@ -14,7 +14,7 @@ from discord.ext import tasks
 
 import logging
 from core.logging import get_logger
-from core.utils import cut_trailing_sentence
+from core.utils import cut_trailing_sentence, anti_spam
 
 logger = get_logger(__name__)
 
@@ -95,6 +95,9 @@ class DiscordBot(Bot):
     
     async def get_msg_ctx(self, channel):
         messages = await channel.history(limit=40).flatten()
+        messages, to_remove = anti_spam(messages)
+        if to_remove:
+            logger.info(f'Removed {to_remove} messages from the context.')
         chain = []
         for message in reversed(messages):
             if not message.embeds and message.content:
