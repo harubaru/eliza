@@ -157,7 +157,7 @@ class DiscordBot(Bot):
         finally:
             self.debounce = False
     
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=10)
     async def idle_loop(self):
         await self.client.wait_until_ready()
         # get last message in a random priority channel
