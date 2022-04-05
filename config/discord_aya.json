@@ -38,7 +38,7 @@
                 "max_length": 100,
                 "min_length": 1,
                 "eos_token_id": 198,
-                "best_of": 12
+                "best_of": 1
             }
         }
     }
