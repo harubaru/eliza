@@ -83,7 +83,7 @@ class DiscordBot(Bot):
             postprocessors=[NewlinePrunerPostprocessor()]
         )
 
-        self.debounce = False
+        self.debounce = {}
     
     def get_priority_channel(self, priority_channels):
         if isinstance(priority_channels, list):
@@ -130,12 +130,15 @@ class DiscordBot(Bot):
         if message.author.id == self.client.user.id:
             return
 
-        if self.debounce:
+        if message.channel.id not in self.debounce:
+            self.debounce[message.channel.id] = False
+
+        if self.debounce[message.channel.id] == True:
             logger.info(f'Debouncing message - ID: {message.id}')
             return
         else:
             logger.info(f'Processing message - ID: {message.id}')
-            self.debounce = True
+            self.debounce[message.channel.id] = True
         try:
             conversation = await self.get_msg_ctx(message.channel)
 
@@ -155,7 +158,7 @@ class DiscordBot(Bot):
             )
             await message.channel.send(embed=embed)
         finally:
-            self.debounce = False
+            self.debounce[message.channel.id] = False
     
     @tasks.loop(seconds=10)
     async def idle_loop(self):
