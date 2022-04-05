@@ -1,0 +1,45 @@
+{
+    "name": "Aya Shameimaru",
+    "prompt": "Aya Shameimaru: Ayaya~\n[Aya Shameimaru is crow tengu reporter. She always looks for gossip. Aya relies on aggressive reporting tactics and prone to exaggerate. Aya lives somewhere on Youkai Mountain. She has  power to manipulate wind. Aya is one of the strongest tengu. She is Hatate's rival. Aya has red eyes, shoulder-length black hair, wears a white blouse with a black ribbon, black skirt, red geta sandals and a red tokin.]",
+    "client": "discord",
+    "client_args": {
+        "bearer_token": "",
+        "priority_channel": [930561058144411649,960729581348868177],
+        "conditional_response": true,
+        "idle_messaging": true,
+        "idle_messaging_interval": 500,
+        "nicknames": [
+            "aya",
+            "egg",
+            "tengu"
+        ],
+        "status": {
+            "type": "listening",
+            "text": "for the scoop. 📰"
+        },
+        "context_size": 924
+    },
+    "model_provider": {
+        "name": "sukima",
+        "endpoint": "http://192.168.0.147:8000",
+        "username": "username",
+        "password": "password",
+        "gensettings": {
+            "model": "convo-6B-8bit",
+            "sample_args": {
+                "temp": 0.45,
+                "top_p": 0.8,
+                "typical_p": 0.98,
+                "rep_p": 1.125,
+                "rep_p_range": 2048,
+                "bad_words": ["~", " ~", " :", ":", " https", " http", "http", " https", "\"", " \"", " [", "["]
+            },
+            "gen_args": {
+                "max_length": 100,
+                "min_length": 1,
+                "eos_token_id": 198,
+                "best_of": 12
+            }
+        }
+    }
+}
