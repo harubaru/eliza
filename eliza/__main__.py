@@ -21,6 +21,7 @@ def main():
     logger.info('Loading config...')
     chatbot_config = config(parse())
     bot = None
+    exit_code = 0
     try:
         logger.info('Getting model provider...')
         model_provider = get_model_provider(chatbot_config)
@@ -61,17 +62,16 @@ def main():
             raise Exception('unsupported client')
     except KeyboardInterrupt:
         print('Exiting...')
-        bot.close()
-        sys.exit(0)
+        exit_code = 0
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())
-        bot.close()
-        sys.exit(1)
+        exit_code = 1
     finally:
         logger.info('Exiting...')
-        bot.close()
-        sys.exit(0)
+        if bot is not None:
+            bot.close()
+        sys.exit(exit_code)
 
 if __name__ == '__main__':
     main()
