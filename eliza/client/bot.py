@@ -148,7 +148,9 @@ class DiscordBot(Bot):
                 elif await self.chatbot.should_respond_async(conversation, push_chain=False):
                     await self.respond(conversation, message)
             else:
-                await self.respond(conversation, message)
+                if self.client.user.mentioned_in(message) or any(t in message.content.lower() for t in self.kwargs['nicknames']):
+                    await self.respond(conversation, message)
+        
         except Exception as e:
             logger.error(e)
             logger.error(traceback.format_exc())
