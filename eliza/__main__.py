@@ -41,6 +41,7 @@ def main():
                 nicknames=get_key(chatbot_config['client_args'], 'nicknames'),
                 status=get_key(chatbot_config['client_args'], 'status', required=False, default=None),
                 context_size=get_key(chatbot_config['client_args'], 'context_size', required=False, default=924),
+                logging_channel=get_key(chatbot_config['client_args'], 'logging_channel', required=False, default=None)
             )
             logger.info('Starting %s with Discord as the client...'%chatbot_config['name'])
             bot.run()

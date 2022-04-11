@@ -84,6 +84,7 @@ class DiscordBot(Bot):
         )
 
         self.debounce = {}
+        self.logging_channel = None
     
     def get_priority_channel(self, priority_channels):
         if isinstance(priority_channels, list):
@@ -157,9 +158,14 @@ class DiscordBot(Bot):
             logger.error(traceback.format_exc())
             embed = discord.Embed(
                 title='Error',
-                description=str(f'Exception Type: ``{repr(e)}``\nTraceback: ``{traceback.format_exc()}``'),
+                description=str(f'**Exception:** **``{repr(e)}``**\n```{traceback.format_exc()}```'),
             )
-            await message.channel.send(embed=embed)
+            if self.kwargs['logging_channel'] is None:
+                await message.channel.send(embed=embed)
+            else:
+                if self.logging_channel is None:
+                    self.logging_channel = self.client.get_channel(self.kwargs['logging_channel'])
+                await self.logging_channel.send(embed=embed)
         finally:
             self.debounce[message.channel.id] = False
     
