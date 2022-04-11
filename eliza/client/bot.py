@@ -142,13 +142,14 @@ class DiscordBot(Bot):
         try:
             conversation = await self.get_msg_ctx(message.channel)
 
+            message_content = re.sub(r'\<[^>]*\>', '', message.content.lower())
             if self.kwargs['conditional_response'] == True:
-                if self.client.user.mentioned_in(message) or any(t in message.content.lower() for t in self.kwargs['nicknames']):
+                if self.client.user.mentioned_in(message) or any(t in message_content for t in self.kwargs['nicknames']):
                     await self.respond(conversation, message)
                 elif await self.chatbot.should_respond_async(conversation, push_chain=False):
                     await self.respond(conversation, message)
             else:
-                if self.client.user.mentioned_in(message) or any(t in message.content.lower() for t in self.kwargs['nicknames']):
+                if self.client.user.mentioned_in(message) or any(t in message_content for t in self.kwargs['nicknames']):
                     await self.respond(conversation, message)
         
         except Exception as e:
