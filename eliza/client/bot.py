@@ -2,11 +2,14 @@ import random
 import re
 import traceback
 import asyncio
+from typing import ContextManager
 import regex
 import datetime
 from shimeji import ChatBot
+from shimeji.memory import memory_context, str_to_numpybin, array_to_str
 from shimeji.preprocessor import ContextPreprocessor
 from shimeji.postprocessor import NewlinePrunerPostprocessor
+from shimeji.util import ContextEntry, INSERTION_TYPE_NEWLINE, TRIM_DIR_TOP, TRIM_TYPE_SENTENCE
 
 import tweepy
 import discord
@@ -34,7 +37,7 @@ class TerminalBot(Bot):
         self.chatbot = ChatBot(
             name=self.name,
             model_provider=self.model_provider,
-            preprocessors=[ContextPreprocessor()],
+            preprocessors=[],
             postprocessors=[NewlinePrunerPostprocessor()]
         )
     
@@ -85,6 +88,9 @@ class DiscordBot(Bot):
 
         self.debounce = {}
         self.logging_channel = None
+        self.privacy_role = None
+        self.anonymous_role = None
+        self.mem_args = self.kwargs['mem_args']
     
     def get_priority_channel(self, priority_channels):
         if isinstance(priority_channels, list):
@@ -118,10 +124,120 @@ class DiscordBot(Bot):
     async def on_ready(self):
         logger.info(f'Connected to Discord - ID: {self.client.user.id} - Name: {self.client.user.name}')
     
+    async def build_ctx(self, conversation):
+        contextmgr = ContextPreprocessor(self.kwargs['context_size'])
+
+        prompt = self.kwargs['prompt']
+        prompt_entry = ContextEntry(
+            text=prompt,
+            prefix='',
+            suffix='\n',
+            reserved_tokens=512,
+            insertion_order=1000,
+            insertion_position=-1,
+            insertion_type=INSERTION_TYPE_NEWLINE,
+            forced_activation=True,
+            cascading_activation=False
+        )
+        contextmgr.add_entry(prompt_entry)
+
+        # memories
+        if self.kwargs['memory_store_provider'] is not None:
+            memories = await self.kwargs['memory_store_provider'].get()
+            if not memories:
+                logger.info('No memories found.')
+            else:
+                memories_ctx = memory_context(memories[-1], memories, short_term=self.mem_args['short_term_amount'], long_term=self.mem_args['long_term_amount'])
+                memories_entry = ContextEntry(
+                    text=memories_ctx,
+                    prefix='',
+                    suffix='\n',
+                    reserved_tokens=0,
+                    insertion_order=800,
+                    insertion_position=0,
+                    trim_direction=TRIM_DIR_TOP,
+                    trim_type=TRIM_TYPE_SENTENCE,
+                    insertion_type=INSERTION_TYPE_NEWLINE,
+                    forced_activation=True,
+                    cascading_activation=False
+                )
+                contextmgr.add_entry(memories_entry)
+#                print('--memoriesctx--\n' + memories_ctx+'\n----')
+        
+        # conversation
+        conversation_entry = ContextEntry(
+            text=conversation,
+            prefix='',
+            suffix=f'\n{self.name}:',
+            reserved_tokens=512,
+            insertion_order=0,
+            insertion_position=-1,
+            trim_direction=TRIM_DIR_TOP,
+            trim_type=TRIM_TYPE_SENTENCE,
+            insertion_type=INSERTION_TYPE_NEWLINE,
+            forced_activation=True,
+            cascading_activation=False
+        )
+        contextmgr.add_entry(conversation_entry)
+
+        return contextmgr.context(self.kwargs['context_size'])
+
     async def respond(self, conversation, message):
+        if self.kwargs['memory_store_provider'] is not None:
+            encoded_user_message = ''
+            anonymous = True
+            anonymous_role = discord.utils.get(message.guild.roles, name='Anonymous')
+            private_role = discord.utils.get(message.guild.roles, name='Private')
+            if private_role is not None:
+                # check if the user has the private role, if the user does, don't encode
+                if message.author.get_role(private_role.id) is None:
+                    if message.author.get_role(anonymous_role.id) is None:
+                        anonymous = False
+                    message_content = re.sub(r'\<[^>]*\>', '', message.content.lstrip().rstrip())
+                    author_name = message.author.name
+                    if message_content != '':
+                        if anonymous:
+                            encoded_user_message = f'Deleted User: {message.content}'
+                            author_name = 'Deleted User'
+                        else:
+                            encoded_user_message = f'{message.author.name}: {message.content}'
+                        if await self.kwargs['memory_store_provider'].check_duplicates(
+                            text=message.content,
+                            duplicate_ratio=0.8) == False:
+                            await self.kwargs['memory_store_provider'].add(
+                                author_id=message.author.id,
+                                author=author_name,
+                                text=message.content,
+                                encoding_model=self.mem_args['model'],
+                                encoding=array_to_str(await self.model_provider.hidden_async(
+                                    self.mem_args['model'],
+                                    encoded_user_message,
+                                    layer=self.mem_args['model_layer']
+                                ))
+                            )
+
+        conversation = await self.build_ctx(conversation)
         async with message.channel.typing():
             response = await self.chatbot.respond_async(conversation, push_chain=False)
             response = cut_trailing_sentence(response)
+        
+        # trim left whitespace from response
+        response = response.lstrip()
+
+        if self.kwargs['memory_store_provider'] is not None:
+            # encode bot response
+            if await self.kwargs['memory_store_provider'].check_duplicates(text=response, duplicate_ratio=0.8) == False:
+                await self.kwargs['memory_store_provider'].add(
+                    author_id=self.client.user.id,
+                    author=self.name,
+                    text=response,
+                    encoding_model=self.mem_args['model'],
+                    encoding=array_to_str(await self.model_provider.hidden_async(
+                        self.mem_args['model'],
+                        f'{self.name}: {response}',
+                        layer=self.mem_args['model_layer']))
+                )
+
         await message.channel.send(response)
     
     async def on_message(self, message):
