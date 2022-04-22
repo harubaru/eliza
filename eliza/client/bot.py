@@ -193,21 +193,21 @@ class DiscordBot(Bot):
                 if message.author.get_role(private_role.id) is None:
                     if message.author.get_role(anonymous_role.id) is None:
                         anonymous = False
-                    message_content = re.sub(r'\<[^>]*\>', '', message.content.lstrip().rstrip())
+                    message_content = re.sub(r'\<[^>]*\>', '', message.content.lstrip().rstrip()).lstrip().rstrip()
                     author_name = message.author.name
                     if message_content != '':
                         if anonymous:
-                            encoded_user_message = f'Deleted User: {message.content}'
+                            encoded_user_message = f'Deleted User: {message_content}'
                             author_name = 'Deleted User'
                         else:
-                            encoded_user_message = f'{message.author.name}: {message.content}'
+                            encoded_user_message = f'{message.author.name}: {message_content}'
                         if await self.kwargs['memory_store_provider'].check_duplicates(
                             text=message.content,
                             duplicate_ratio=0.8) == False:
                             await self.kwargs['memory_store_provider'].add(
                                 author_id=message.author.id,
                                 author=author_name,
-                                text=message.content,
+                                text=message_content,
                                 encoding_model=self.mem_args['model'],
                                 encoding=array_to_str(await self.model_provider.hidden_async(
                                     self.mem_args['model'],
