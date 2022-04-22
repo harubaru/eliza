@@ -4,10 +4,10 @@
     "client": "discord",
     "client_args": {
         "bearer_token": "",
-        "priority_channel": 930561058144411649,
-        "conditional_response": true,
+        "priority_channel": [930561058144411649,960729581348868177,963507354215796857],
+        "conditional_response": false,
         "idle_messaging": true,
-        "idle_messaging_interval": 100,
+        "idle_messaging_interval": 50,
         "nicknames": [
             "chen",
             "chensic"
@@ -16,7 +16,16 @@
             "type": "playing",
             "text": "with the samon."
         },
-        "context_size": 924
+        "context_size": 924,
+        "logging_channel": 930509559460663346
+    },
+    "memory_store": {
+        "database_type": "postgresql",
+        "database_uri": "postgresql+asyncpg://postgresql:postgresql@0.0.0.0:2027/eliza",
+        "model": "distilroberta-base",
+        "model_layer": -1,
+        "short_term_amount": 10,
+        "long_term_amount": 10
     },
     "model_provider": {
         "name": "sukima",
@@ -31,7 +40,7 @@
                 "tfs": 0.9,
                 "rep_p": 1.115,
                 "rep_p_range": 1024,
-                "bad_words": ["~", " ~", " Chen", " chen", "chen", "Chen", " ._.", "._."],
+                "bad_words": ["~", " ~", " Chen", " chen", "chen", "Chen", " ._.", "._.", "[", " [", " Jews", " jews", "jews", "Jews", " Niggers", " niggers", "Niggers", "niggers", " Nigger", " nigger"],
                 "logit_biases": [
                     {
                         "id": 13557,
@@ -58,8 +67,7 @@
             "gen_args": {
                 "max_length": 100,
                 "min_length": 1,
-                "eos_token_id": 198,
-                "best_of": 2
+                "eos_token_id": 198
             }
         }
     }
