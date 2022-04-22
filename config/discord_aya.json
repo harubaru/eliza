@@ -19,6 +19,14 @@
         },
         "context_size": 924
     },
+    "memory_store": {
+        "database_type": "postgresql",
+        "database_uri": "postgresql+asyncpg://postgresql:postgresql@0.0.0.0:2027/eliza",
+        "model": "distilroberta-base",
+        "model_layer": -1,
+        "short_term_amount": 10,
+        "long_term_amount": 10
+    },
     "model_provider": {
         "name": "sukima",
         "endpoint": "http://192.168.0.147:8000",
