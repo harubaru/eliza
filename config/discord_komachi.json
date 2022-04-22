@@ -1,0 +1,52 @@
+{
+    "name": "Komachi Onozuka",
+    "prompt": " [Komachi Onozuka is the shinigami that ferries spirits across the Sanzu River. She is lazy, carefree, and chatty. She is Eiki's subordinate. Komachi dislikes when people disrespect Eiki. Komachi is imposingly tall, has red eyes and shoulder-length red hair in two ponytails tied with hair beads.  Komachi carries a scythe. She wears a white dress underneath a blue vest, has an obi with a large coin tied to it, and wears platform sandals. She really adores Eiki and vows to make her happy in any way she can.]\n",
+    "client": "discord",
+    "client_args": {
+        "bearer_token": "",
+        "priority_channel": [930561058144411649,960729581348868177],
+        "conditional_response": false,
+        "idle_messaging": true,
+        "idle_messaging_interval": 50,
+        "nicknames": [
+            "komachi"
+        ],
+        "status": {
+            "type": "watching",
+            "text": "from the shore. 🌺"
+        },
+        "context_size": 924,
+        "logging_channel": 930509559460663346
+    },
+    "memory_store": {
+        "database_type": "postgresql",
+        "database_uri": "postgresql+asyncpg://postgresql:postgresql@0.0.0.0:2027/eliza",
+        "model": "distilroberta-base",
+        "model_layer": -1,
+        "short_term_amount": 10,
+        "long_term_amount": 10
+    },
+    "model_provider": {
+        "name": "sukima",
+        "endpoint": "http://192.168.0.147:8000",
+        "username": "username",
+        "password": "password",
+        "gensettings": {
+            "model": "convo-6B-8bit",
+            "sample_args": {
+                "temp": 0.45,
+                "top_p": 0.8,
+                "typical_p": 0.98,
+                "rep_p": 1.125,
+                "rep_p_range": 2048,
+                "bad_words": ["~", " ~", " Komachi", " komachi", "Komachi", "komachi", " :", ":", " https", " http", "http", " https", "\"", " \"", " [", "[", " Jews", " jews", "jews", "Jews", " Niggers", " niggers", "Niggers", "niggers", " Nigger", " nigger"]
+            },
+            "gen_args": {
+                "max_length": 100,
+                "min_length": 1,
+                "eos_token_id": 198,
+                "best_of": 2
+            }
+        }
+    }
+}
