@@ -182,42 +182,41 @@ class DiscordBot(Bot):
 
         return contextmgr.context(self.kwargs['context_size'])
 
-    async def respond(self, conversation, message):
-        if self.kwargs['memory_store_provider'] is not None:
-            encoded_user_message = ''
-            anonymous = True
-            anonymous_role = discord.utils.get(message.guild.roles, name='Anonymous')
-            private_role = discord.utils.get(message.guild.roles, name='Private')
-            if private_role is not None:
-                # check if the user has the private role, if the user does, don't encode
-                if message.author.get_role(private_role.id) is None:
-                    if message.author.get_role(anonymous_role.id) is None:
-                        anonymous = False
-                    message_content = re.sub(r'\<[^>]*\>', '', message.content.lstrip().rstrip()).lstrip().rstrip()
-                    author_name = message.author.name
-                    if message_content != '':
-                        if anonymous:
-                            encoded_user_message = f'Deleted User: {message_content}'
-                            author_name = 'Deleted User'
-                        else:
-                            encoded_user_message = f'{message.author.name}: {message_content}'
-                        if await self.kwargs['memory_store_provider'].check_duplicates(
-                            text=message.content,
-                            duplicate_ratio=0.8) == False:
-                            await self.kwargs['memory_store_provider'].add(
-                                author_id=message.author.id,
-                                author=author_name,
-                                text=message_content,
-                                encoding_model=self.mem_args['model'],
-                                encoding=array_to_str(await self.model_provider.hidden_async(
-                                    self.mem_args['model'],
-                                    encoded_user_message,
-                                    layer=self.mem_args['model_layer']
-                                ))
-                            )
-
-        conversation = await self.build_ctx(conversation)
+    async def respond(self, conversation, message):        
         async with message.channel.typing():
+            if self.kwargs['memory_store_provider'] is not None:
+                encoded_user_message = ''
+                anonymous = True
+                anonymous_role = discord.utils.get(message.guild.roles, name='Anonymous')
+                private_role = discord.utils.get(message.guild.roles, name='Private')
+                if private_role is not None:
+                    # check if the user has the private role, if the user does, don't encode
+                    if message.author.get_role(private_role.id) is None:
+                        if message.author.get_role(anonymous_role.id) is None:
+                            anonymous = False
+                        message_content = re.sub(r'\<[^>]*\>', '', message.content.lstrip().rstrip()).lstrip().rstrip()
+                        author_name = message.author.name
+                        if message_content != '':
+                            if anonymous:
+                                encoded_user_message = f'Deleted User: {message_content}'
+                                author_name = 'Deleted User'
+                            else:
+                                encoded_user_message = f'{message.author.name}: {message_content}'
+                            if await self.kwargs['memory_store_provider'].check_duplicates(
+                                text=message.content,
+                                duplicate_ratio=0.8) == False:
+                                await self.kwargs['memory_store_provider'].add(
+                                    author_id=message.author.id,
+                                    author=author_name,
+                                    text=message_content,
+                                    encoding_model=self.mem_args['model'],
+                                    encoding=array_to_str(await self.model_provider.hidden_async(
+                                        self.mem_args['model'],
+                                        encoded_user_message,
+                                        layer=self.mem_args['model_layer']
+                                    ))
+                                )
+            conversation = await self.build_ctx(conversation)
             response = await self.chatbot.respond_async(conversation, push_chain=False)
             response = cut_trailing_sentence(response)
         
