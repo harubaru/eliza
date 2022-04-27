@@ -17,7 +17,7 @@ from discord.ext import tasks
 
 import logging
 from core.logging import get_logger
-from core.utils import cut_trailing_sentence, anti_spam
+from core.utils import cut_trailing_sentence, anti_spam, replace_emojis_pings, replace_emojis_pings_inverse
 
 logger = get_logger(__name__)
 
@@ -220,8 +220,9 @@ class DiscordBot(Bot):
             response = await self.chatbot.respond_async(conversation, push_chain=False)
             response = cut_trailing_sentence(response)
         
-        # trim left whitespace from response
+        # trim left whitespace from response and fix emojis and pings
         response = response.lstrip()
+        response = replace_emojis_pings(text=response, users=message.guild.members, emojis=message.guild.emojis)
 
         if self.kwargs['memory_store_provider'] is not None:
             # encode bot response
@@ -258,6 +259,7 @@ class DiscordBot(Bot):
         try:
             conversation = await self.get_msg_ctx(message.channel)
 
+            message_content = replace_emojis_pings_inverse(text=message.content, users=message.guild.members, emojis=message.guild.emojis)
             message_content = re.sub(r'\<[^>]*\>', '', message.content.lower())
             if self.kwargs['conditional_response'] == True:
                 if self.client.user.mentioned_in(message) or any(t in message_content for t in self.kwargs['nicknames']):
