@@ -1,3 +1,4 @@
+import re
 from difflib import SequenceMatcher
 from typing import List
 from discord import Emoji, User
@@ -14,11 +15,20 @@ def anti_spam(messages, threshold=0.8):
     return messages, len(to_remove)
 
 def replace_emojis_pings(text: str, users: List[User], emojis: List[Emoji]) -> str:
+    # sort users from largest username to smallest
+    users.sort(key=lambda user: len(user.name), reverse=True)
+
     for user in users:
-        text = text.replace(f'@{user.name}', f'<@{user.id}>')
+        if f'@{user.name}' in text:
+            text = text.replace(f'@{user.name}', f'<@{user.id}>')
 
     for emoji in emojis:
         text = text.replace(f':{emoji.name}:', f'<:{emoji.name}:{emoji.id}>')
+    
+    # remove any remaining text enclosed in colons
+    text = re.sub(r':\S+:', '', text)
+    # remove any excess spaces
+    text = re.sub(r'\s+', ' ', text)
     
     return text
 
