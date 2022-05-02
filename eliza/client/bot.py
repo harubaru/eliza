@@ -194,7 +194,8 @@ class DiscordBot(Bot):
                     if message.author.get_role(private_role.id) is None:
                         if message.author.get_role(anonymous_role.id) is None:
                             anonymous = False
-                        message_content = re.sub(r'\<[^>]*\>', '', message.content.lstrip().rstrip()).lstrip().rstrip()
+                        message_content = replace_emojis_pings_inverse(text=message.content, users=message.guild.members, emojis=message.guild.emojis)
+                        message_content = re.sub(r'\<[^>]*\>', '', message_content.lstrip().rstrip()).lstrip().rstrip()
                         author_name = message.author.name
                         if message_content != '':
                             if anonymous:
