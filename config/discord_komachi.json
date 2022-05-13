@@ -24,22 +24,49 @@
         "model": "distilroberta-base",
         "model_layer": -1,
         "short_term_amount": 10,
-        "long_term_amount": 10
+        "long_term_amount": 5
+    },
+    "vision_provider": {
+        "model": "clip-vit-large-patch14-336",
+        "top_k": 3,
+        "text_sets": [
+            {
+                "filename": "labelsets/phototypes.txt",
+                "prefix": "This is a ",
+                "suffix": "."
+            },
+            {
+                "filename": "labelsets/peoplequantity.txt",
+                "prefix": "There ",
+                "suffix": " in this image."
+            },
+            {
+                "filename": "labelsets/places.txt",
+                "prefix": "This image depicts a ",
+                "suffix": "."
+            },
+            {
+                "filename": "labelsets/touhous.txt",
+                "prefix": "Image with the Touhou Project character ",
+                "suffix": " in it."
+            }
+        ]
     },
     "model_provider": {
         "name": "sukima",
-        "endpoint": "http://192.168.0.147:8000",
+        "endpoint": "http://0.0.0.0:8000",
         "username": "username",
         "password": "password",
         "gensettings": {
             "model": "convo-6B-8bit",
             "sample_args": {
                 "temp": 0.45,
-                "top_p": 0.8,
+                "top_p": 0.9,
+		"top_k": 10,
                 "typical_p": 0.98,
                 "rep_p": 1.125,
                 "rep_p_range": 2048,
-                "bad_words": ["~", " ~", " Komachi", " komachi", "Komachi", "komachi", " :", ":", " https", " http", "http", " https", "\"", " \"", " [", "[", " Jews", " jews", "jews", "Jews", " Niggers", " niggers", "Niggers", "niggers", " Nigger", " nigger"]
+                "bad_words": ["~", " ~", " Komachi", " komachi", "Komachi", "komachi", " https", " http", "http", " https", "\"", " \"", " [", "[", " Jews", " jews", "jews", "Jews", " Niggers", " niggers", "Niggers", "niggers", " Nigger", " nigger", "\"", " \"", " —", "—", "?mute", "?unmute", " ?mute", " ?unmute", "@", " @"]
             },
             "gen_args": {
                 "max_length": 100,

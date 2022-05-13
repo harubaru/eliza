@@ -51,6 +51,12 @@ def get_memorystore_provider(args):
     else:
         raise Exception('memory_store requires database_type to be specified.')
 
+def get_vision_provider(args):
+    if 'vision_provider' not in args:
+        return None
+    
+    return args['vision_provider']
+
 def get_model_provider(args):
     # load model provider gen_args into basemodel
     if 'model_provider' not in args:

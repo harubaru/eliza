@@ -73,11 +73,14 @@ class DiscordBot(Bot):
             activity = discord.Activity(
                 type=discord.ActivityType.watching,
                 name=status['text']
-            )        
+            )
 
         intents = discord.Intents().all()
 
         self.client = discord.Client(intents=intents, activity=activity, status=discord.Status.online)
+
+        if 'vision_provider' in self.kwargs:
+            self.labels = self.compile_label(self.kwargs['vision_provider']['text_sets'])
 
         self.chatbot = ChatBot(
             name=self.name,
@@ -181,9 +184,39 @@ class DiscordBot(Bot):
         contextmgr.add_entry(conversation_entry)
 
         return contextmgr.context(self.kwargs['context_size'])
+    
+    def compile_label(self, text_sets):
+        labels = []
+        for text_set in text_sets:
+            loaded_labels = []
+            with open(text_set['filename']) as f:
+                loaded_labels = f.read().split('\n')
+            labels.append([f'{text_set["prefix"]}{p}{text_set["suffix"]}' for p in loaded_labels])
+        return labels
 
     async def respond(self, conversation, message):        
         async with message.channel.typing():
+
+            encoded_image_label = ''
+
+            if self.kwargs['vision_provider'] is not None:
+                if message.attachments:
+                    attachment_url = message.attachments[0].proxy_url
+                    if attachment_url.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.webp')):
+                        clip_labels = await self.model_provider.image_label_async(self.kwargs['vision_provider']['model'], attachment_url, self.labels)
+
+                        sorted_labels = []
+                        for label_set in clip_labels['labels']:
+                            sorted_labels.append(sorted(label_set.items(), key=lambda x: x[1], reverse=True))
+
+                        sorted_labels = sorted(sorted_labels, key=lambda x: x[0][1], reverse=True)[:self.kwargs['vision_provider']['top_k']]
+
+                        for label in sorted_labels:
+                            encoded_image_label += f' {label[0][0]}'
+                        
+                        encoded_image_label = f'\n{message.author.name}: [Image Attached:{encoded_image_label}]'
+#                        print(encoded_image_label)
+
             if self.kwargs['memory_store_provider'] is not None:
                 encoded_user_message = ''
                 anonymous = True
@@ -217,7 +250,8 @@ class DiscordBot(Bot):
                                         layer=self.mem_args['model_layer']
                                     ))
                                 )
-            conversation = await self.build_ctx(conversation)
+            conversation = await self.build_ctx(conversation + encoded_image_label)
+#            print(conversation)
             response = await self.chatbot.respond_async(conversation, push_chain=False)
             response = cut_trailing_sentence(response)
         
