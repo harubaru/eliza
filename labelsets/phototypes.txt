@@ -1,0 +1,4 @@
+photo
+cartoon
+sketch
+painting
