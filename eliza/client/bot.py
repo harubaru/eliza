@@ -79,7 +79,7 @@ class DiscordBot(Bot):
 
         self.client = discord.Client(intents=intents, activity=activity, status=discord.Status.online)
 
-        if 'vision_provider' in self.kwargs:
+        if ('vision_provider' in self.kwargs) and (self.kwargs['vision_provider'] is not None):
             self.labels = self.compile_label(self.kwargs['vision_provider']['text_sets'])
 
         self.chatbot = ChatBot(
