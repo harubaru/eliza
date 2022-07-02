@@ -279,13 +279,19 @@ class DiscordBot(Bot):
     def authorized_dm(self, message):
         # cache guild and roles
         if self.supporter_guild is None:
-            self.supporter_guild = self.client.get_guild(self.kwargs['supporter_guild_id'])
+            if self.kwargs['supporter_guild_id'] is not None:
+                self.supporter_guild = self.client.get_guild(self.kwargs['supporter_guild_id'])
+            else:
+                return False
         if self.supporter_roles is None:
             self.supporter_roles = []
-            for role_id in self.kwargs['supporter_role_ids']:
-                role = discord.utils.get(self.supporter_guild, id=role_id)
-                if role is not None:
-                    self.supporter_roles.append(role)
+            if self.kwargs['supporter_role_ids'] is not None:
+                for role_id in self.kwargs['supporter_role_ids']:
+                    role = discord.utils.get(self.supporter_guild, id=role_id)
+                    if role is not None:
+                        self.supporter_roles.append(role)
+            else:
+                return False
             
         member = self.supporter_guild.get_member(message.author.id)
         
