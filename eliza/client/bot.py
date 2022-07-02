@@ -258,7 +258,8 @@ class DiscordBot(Bot):
         
         # trim left whitespace from response and fix emojis and pings
         response = response.lstrip()
-        response = replace_emojis_pings(text=response, users=message.guild.members, emojis=message.guild.emojis)
+        if message.guild != None:
+            response = replace_emojis_pings(text=response, users=message.guild.members, emojis=message.guild.emojis)
 
         if self.kwargs['memory_store_provider'] is not None:
             # encode bot response
@@ -327,8 +328,8 @@ class DiscordBot(Bot):
             self.debounce[message.channel.id] = True
         try:
             conversation = await self.get_msg_ctx(message.channel)
-
-            message_content = replace_emojis_pings_inverse(text=message.content, users=message.guild.members, emojis=message.guild.emojis)
+            if message.guild != None:
+                message_content = replace_emojis_pings_inverse(text=message.content, users=message.guild.members, emojis=message.guild.emojis)
             message_content = re.sub(r'\<[^>]*\>', '', message.content.lower())
             if self.kwargs['conditional_response'] == True:
                 if self.client.user.mentioned_in(message) or any(t in message_content for t in self.kwargs['nicknames']):
