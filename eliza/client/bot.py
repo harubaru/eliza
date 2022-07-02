@@ -339,6 +339,8 @@ class DiscordBot(Bot):
             else:
                 if self.client.user.mentioned_in(message) or any(t in message_content for t in self.kwargs['nicknames']):
                     await self.respond(conversation, message)
+                elif isinstance(message.channel, discord.channel.DMChannel):
+                    await self.respond(conversation, message)
         
         except Exception as e:
             logger.error(e)
