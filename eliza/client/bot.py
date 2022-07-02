@@ -287,7 +287,7 @@ class DiscordBot(Bot):
             self.supporter_roles = []
             if self.kwargs['supporter_role_ids'] is not None:
                 for role_id in self.kwargs['supporter_role_ids']:
-                    role = discord.utils.get(self.supporter_guild, id=role_id)
+                    role = discord.utils.get(self.supporter_guild.roles, id=role_id)
                     if role is not None:
                         self.supporter_roles.append(role)
             else:
