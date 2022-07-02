@@ -93,7 +93,10 @@ class DiscordBot(Bot):
         self.logging_channel = None
         self.privacy_role = None
         self.anonymous_role = None
+        self.supporter_roles = None
+        self.supporter_guild = None
         self.mem_args = self.kwargs['mem_args']
+        self.kwargs = kwargs
     
     def get_priority_channel(self, priority_channels):
         if isinstance(priority_channels, list):
@@ -165,7 +168,6 @@ class DiscordBot(Bot):
                     cascading_activation=False
                 )
                 contextmgr.add_entry(memories_entry)
-#                print('--memoriesctx--\n' + memories_ctx+'\n----')
         
         # conversation
         conversation_entry = ContextEntry(
@@ -215,7 +217,6 @@ class DiscordBot(Bot):
                             encoded_image_label += f' {label[0][0]}'
                         
                         encoded_image_label = f'\n{message.author.name}: [Image Attached:{encoded_image_label}]'
-#                        print(encoded_image_label)
 
             if self.kwargs['memory_store_provider'] is not None:
                 encoded_user_message = ''
@@ -251,7 +252,7 @@ class DiscordBot(Bot):
                                     ))
                                 )
             conversation = await self.build_ctx(conversation + encoded_image_label)
-#            print(conversation)
+
             response = await self.chatbot.respond_async(conversation, push_chain=False)
             response = cut_trailing_sentence(response)
         
@@ -275,12 +276,39 @@ class DiscordBot(Bot):
 
         await message.channel.send(response)
     
+    def authorized_dm(self, message):
+        # cache guild and roles
+        if self.supporter_guild is None:
+            self.supporter_guild = self.client.get_guild(self.kwargs['supporter_guild_id'])
+        if self.supporter_roles is None:
+            self.supporter_roles = []
+            for role_id in self.kwargs['supporter_role_ids']:
+                role = discord.utils.get(self.supporter_guild, id=role_id)
+                if role is not None:
+                    self.supporter_roles.append(role)
+            
+        member = self.supporter_guild.get_member(message.author.id)
+        
+        if member is None:
+            return False # not in server, not authorized
+
+        for role in self.supporter_roles:
+            if member.get_role(role.id) is not None:
+                return True
+
+        return False # User doesn't have role -- not authorized
+
     async def on_message(self, message):
         priority_channels = self.get_priority_channel(self.kwargs['priority_channel'])
-        if message.channel.id not in priority_channels:
+        if (message.channel.id not in priority_channels) and not isinstance(message.channel, discord.channel.DMChannel):
             return
         if message.author.id == self.client.user.id:
             return
+        
+        # check if authorized to dm
+        if isinstance(message.channel, discord.channel.DMChannel):
+            if not self.authorized_dm(message):
+                return
 
         if message.channel.id not in self.debounce:
             self.debounce[message.channel.id] = False

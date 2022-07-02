@@ -17,7 +17,12 @@
             "text": "with gaps~ 👁️"
         },
         "context_size": 924,
-        "logging_channel": 930509559460663346
+        "logging_channel": 930509559460663346,
+        "supporter_guild_id": 930499730843250783,
+        "supporter_role_ids": [
+            934998817055584266,
+            954930408053694515
+        ]
     },
     "memory_store": {
         "database_type": "postgresql",

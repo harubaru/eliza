@@ -51,6 +51,8 @@ def main():
                 private_role_id=get_key(chatbot_config['client_args'], 'private_role_id', required=False, default=None),
                 anonymous_role_id=get_key(chatbot_config['client_args'], 'anonymous_role_id', required=False, default=None),
                 mem_args = memory_store_args,
+                supporter_guild_id = get_key(chatbot_config['client_args'], 'supporter_guild_id', required=False, default=None),
+                supporter_role_ids = get_key(chatbot_config['client_args'], 'supporter_role_ids', required=False, default=None),
             )
             logger.info('Starting %s with Discord as the client...'%chatbot_config['name'])
             bot.run()
