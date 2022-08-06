@@ -27,6 +27,9 @@ class AuthCog(commands.Cog, name='Auth', description='Used by server admins to a
     )
     async def toggle(self, ctx: discord.ApplicationContext, channel: discord.TextChannel):
         try:
+            if ctx.guild.member_count < 40:
+                await ctx.send_response(content='Unable to authorize for guilds with less than 40 members.', ephemeral=True)
+                return
             with open(self.auth_file, 'r') as fp:
                 auth_data = json.load(fp)
             with open(self.auth_file, 'w') as fp:
