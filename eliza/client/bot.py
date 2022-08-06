@@ -1,3 +1,4 @@
+import json
 import random
 import re
 import traceback
@@ -77,11 +78,13 @@ class DiscordBot(Bot):
 
         intents = discord.Intents().all()
 
-        self.client = discord.Client(intents=intents, activity=activity, status=discord.Status.online)
+        self.client = discord.Bot(intents=intents, activity=activity, status=discord.Status.online)
 
         if ('vision_provider' in self.kwargs) and (self.kwargs['vision_provider'] is not None):
             self.labels = self.compile_label(self.kwargs['vision_provider']['text_sets'])
-
+        if self.kwargs['public'] is True:
+            self.client.load_extension('client.authcog')
+        
         self.chatbot = ChatBot(
             name=self.name,
             model_provider=self.model_provider,
@@ -304,10 +307,22 @@ class DiscordBot(Bot):
                 return True
 
         return False # User doesn't have role -- not authorized
+    
+    def authorized_guild(self, message):
+        if self.kwargs['public'] is False:
+            logger.info(f'Chatbot is private')
+            return False
+        channel_id = str(message.channel.id)
+        with open('auth.json', 'r') as fp:
+            auth_data = json.load(fp)
+            if channel_id in auth_data:
+                return True
+            else:
+                return False
 
     async def on_message(self, message):
         priority_channels = self.get_priority_channel(self.kwargs['priority_channel'])
-        if (message.channel.id not in priority_channels) and not isinstance(message.channel, discord.channel.DMChannel):
+        if (message.channel.id not in priority_channels) and (not self.authorized_guild(message)) and (not isinstance(message.channel, discord.channel.DMChannel)):
             return
         if message.author.id == self.client.user.id:
             return
