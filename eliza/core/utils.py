@@ -3,6 +3,26 @@ from difflib import SequenceMatcher
 from typing import List
 from discord import Emoji, User
 
+# funky globals
+supporter_guild = None
+supporter_roles = None
+
+def set_guild(guild):
+    global supporter_guild
+    supporter_guild = guild
+
+def get_guild():
+    global supporter_guild
+    return supporter_guild
+
+def set_roles(roles):
+    global supporter_roles
+    supporter_roles = roles
+
+def get_roles():
+    global supporter_roles
+    return supporter_roles
+
 def anti_spam(messages, threshold=0.8):
     to_remove = []
     for i in range(len(messages)):
@@ -19,14 +39,13 @@ def replace_emojis_pings(text: str, users: List[User], emojis: List[Emoji]) -> s
     users.sort(key=lambda user: len(user.name), reverse=True)
 
     for user in users:
-        if f'@{user.name}' in text:
-            text = text.replace(f'@{user.name}', f'<@{user.id}>')
+        text = text.replace(f'@{user.name}', f'<@{user.id}>')
 
     for emoji in emojis:
         text = text.replace(f':{emoji.name}:', f'<:{emoji.name}:{emoji.id}>')
     
     # remove any remaining text enclosed in colons
-    text = re.sub(r':\S+:', '', text)
+#    text = re.sub(r':\S+:', '', text)
     # remove any excess spaces
     text = re.sub(r'\s+', ' ', text)
     

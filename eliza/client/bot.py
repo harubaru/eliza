@@ -18,7 +18,7 @@ from discord.ext import tasks
 
 import logging
 from core.logging import get_logger
-from core.utils import cut_trailing_sentence, anti_spam, replace_emojis_pings, replace_emojis_pings_inverse
+from core.utils import cut_trailing_sentence, anti_spam, replace_emojis_pings, replace_emojis_pings_inverse, set_guild, set_roles
 
 logger = get_logger(__name__)
 
@@ -132,6 +132,8 @@ class DiscordBot(Bot):
 
     async def on_ready(self):
         logger.info(f'Connected to Discord - ID: {self.client.user.id} - Name: {self.client.user.name}')
+        self.cache_roles()
+        logger.info(f'Cached roles.')
     
     async def build_ctx(self, conversation):
         contextmgr = ContextPreprocessor(self.kwargs['context_size'])
@@ -280,11 +282,12 @@ class DiscordBot(Bot):
 
         await message.channel.send(response)
     
-    def authorized_dm(self, message):
+    def cache_roles(self):
         # cache guild and roles
         if self.supporter_guild is None:
             if self.kwargs['supporter_guild_id'] is not None:
                 self.supporter_guild = self.client.get_guild(self.kwargs['supporter_guild_id'])
+                set_guild(self.supporter_guild)
             else:
                 return False
         if self.supporter_roles is None:
@@ -294,8 +297,15 @@ class DiscordBot(Bot):
                     role = discord.utils.get(self.supporter_guild.roles, id=role_id)
                     if role is not None:
                         self.supporter_roles.append(role)
+                        set_roles(self.supporter_roles)
             else:
                 return False
+        return True
+    
+    def authorized_dm(self, message):
+        # cache guild and roles
+        if not self.cache_roles():
+            return False
             
         member = self.supporter_guild.get_member(message.author.id)
         
@@ -312,6 +322,7 @@ class DiscordBot(Bot):
         if self.kwargs['public'] is False:
             logger.info(f'Chatbot is private')
             return False
+        self.cache_roles()
         channel_id = str(message.channel.id)
         with open('auth.json', 'r') as fp:
             auth_data = json.load(fp)

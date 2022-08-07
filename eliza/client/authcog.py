@@ -4,9 +4,10 @@ import discord
 from discord.commands import SlashCommandGroup, Option
 from discord.ext import commands
 
-
 import logging
 from core.logging import get_logger
+from core.utils import get_guild, get_roles
+
 logger = get_logger(__name__)
 
 class AuthCog(commands.Cog, name='Auth', description='Used by server admins to authorize the bot.'):
@@ -21,14 +22,29 @@ class AuthCog(commands.Cog, name='Auth', description='Used by server admins to a
             with open(self.auth_file, 'w') as fp:
                 fp.write(json.dumps({"0":{}}))
     
+    def supporter_auth(self, ctx: discord.ApplicationContext):
+        if get_guild() is not None:
+            member = get_guild().get_member(ctx.author.id)
+            if member is None:
+                return False
+            else:
+                if get_roles() is None:
+                    return False
+                for role in get_roles():
+                    if member.get_role(role.id) is not None:
+                        return True
+        else:
+            return False
+
+    
     @commands.slash_command(name='toggle', description='Toggle this AI chatbot in a specific channel.')
     @discord.default_permissions(
         administrator=True,
     )
     async def toggle(self, ctx: discord.ApplicationContext, channel: discord.TextChannel):
         try:
-            if ctx.guild.member_count < 40:
-                await ctx.send_response(content='Unable to authorize for guilds with less than 40 members.', ephemeral=True)
+            if ctx.guild.member_count < 40 and not self.supporter_auth(ctx):
+                await ctx.send_response(content='Unable to authorize for guilds with less than 40 members. You can get around this by supporting us on Patreon or boosting our server!', ephemeral=True)
                 return
             with open(self.auth_file, 'r') as fp:
                 auth_data = json.load(fp)
@@ -47,5 +63,6 @@ class AuthCog(commands.Cog, name='Auth', description='Used by server admins to a
         except Exception as e:
             embed = discord.Embed(title='Toggle failed.', description=f'An exception has occurred while toggling the AI.\nError: {e}')
             await ctx.send_response(embed=embed, ephemeral=True)
+
 def setup(bot):
     bot.add_cog(AuthCog(bot))
