@@ -22,9 +22,6 @@ from core.logging import get_logger
 from core.utils import cut_trailing_sentence, anti_spam, replace_emojis_pings, replace_emojis_pings_inverse, set_guild, set_roles
 from core.ratelimiter import AsyncRateLimiter
 
-import tracemalloc
-tracemalloc.start()
-
 logger = get_logger(__name__)
 
 class Bot:
