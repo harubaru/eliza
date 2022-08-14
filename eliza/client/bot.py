@@ -213,7 +213,7 @@ class DiscordBot(Bot):
         duration = int(round(until - time.time()))
         self.rate_limiters[str(self.last_message.channel.id)][1] = until
         self.rate_limiters[str(self.last_message.channel.id)][2] = True
-        await self.last_message.channel.send(f'<Please wait for {duration} seconds to talk to me!>', delete_after=5.0)
+        await self.last_message.channel.send(f'<Please wait for ``{duration}`` seconds to talk to me! **``This message will delete itself when the cooldown is over.``**>', delete_after=until - time.time())
 
     async def respond(self, conversation, message):
         async with message.channel.typing():
