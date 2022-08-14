@@ -213,7 +213,7 @@ class DiscordBot(Bot):
         duration = int(round(until - time.time()))
         self.rate_limiters[str(self.last_message.channel.id)][1] = until
         self.rate_limiters[str(self.last_message.channel.id)][2] = True
-        await self.last_message.channel.send(f'<Please wait for {duration} seconds to talk to me!>')
+        await self.last_message.channel.send(f'<Please wait for {duration} seconds to talk to me!>', delete_after=5.0)
 
     async def respond(self, conversation, message):
         async with message.channel.typing():
@@ -369,7 +369,7 @@ class DiscordBot(Bot):
                         await self.__limited(until=self.rate_limiters[channel_id][1])
                         return
         else:
-            self.rate_limiters[channel_id] = [AsyncRateLimiter(max_calls=5, period=60.0, callback=self.__limited), time.time()-1, False] #[ratelimiter, until, rate_limited]
+            self.rate_limiters[channel_id] = [AsyncRateLimiter(max_calls=5, period=45.0, callback=self.__limited), time.time()-1, False] #[ratelimiter, until, rate_limited]
 
         if message.channel.id not in self.debounce:
             self.debounce[message.channel.id] = False
