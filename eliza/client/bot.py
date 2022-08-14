@@ -415,7 +415,17 @@ class DiscordBot(Bot):
             else:
                 if self.logging_channel is None:
                     self.logging_channel = self.client.get_channel(self.kwargs['logging_channel'])
-                await self.logging_channel.send(embed=embed)
+                if len(str(f'**Exception:** **``{repr(e)}``**\n```{traceback.format_exc()}```')) < 5900:
+                    await self.logging_channel.send(embed=embed)
+                else:
+                    errorfile = open('error.txt', 'w')
+                    errorfile.write(f'**Exception:** **``{repr(e)}``**\n```{traceback.format_exc()}```')
+                    errorfile.close()
+                    embed = discord.Embed(
+                        title='Error',
+                        description=str(f'The error is too large, check the attached file'),
+                    )
+                    await self.logging_channel.send(embed=embed, file=discord.File('error.txt'))
         finally:
             self.debounce[message.channel.id] = False
     
