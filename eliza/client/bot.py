@@ -364,8 +364,10 @@ class DiscordBot(Bot):
             if self.last_message != None:
                 if self.rate_limiters[str(self.last_message.channel.id)][1] > time.time():
                     # ratelimited
-                    await self.__limited(until=self.rate_limiters[channel_id][1])
-                    return
+                    message_content = re.sub(r'\<[^>]*\>', '', message.content.lower())
+                    if self.client.user.mentioned_in(message) or any(t in message_content for t in self.kwargs['nicknames']):
+                        await self.__limited(until=self.rate_limiters[channel_id][1])
+                        return
         else:
             self.rate_limiters[channel_id] = [AsyncRateLimiter(max_calls=5, period=60.0, callback=self.__limited), time.time()-1, False] #[ratelimiter, until, rate_limited]
 
