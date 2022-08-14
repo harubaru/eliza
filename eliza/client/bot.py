@@ -1,6 +1,7 @@
 import json
 import random
 import re
+import time
 import traceback
 import asyncio
 from typing import ContextManager
@@ -19,6 +20,10 @@ from discord.ext import tasks
 import logging
 from core.logging import get_logger
 from core.utils import cut_trailing_sentence, anti_spam, replace_emojis_pings, replace_emojis_pings_inverse, set_guild, set_roles
+from core.ratelimiter import AsyncRateLimiter
+
+import tracemalloc
+tracemalloc.start()
 
 logger = get_logger(__name__)
 
@@ -100,7 +105,9 @@ class DiscordBot(Bot):
         self.supporter_guild = None
         self.mem_args = self.kwargs['mem_args']
         self.kwargs = kwargs
-    
+        self.last_message = None
+        self.rate_limiters = {} # {channel_id: ratelimiter}
+
     def get_priority_channel(self, priority_channels):
         if isinstance(priority_channels, list):
             return priority_channels
@@ -201,7 +208,14 @@ class DiscordBot(Bot):
             labels.append([f'{text_set["prefix"]}{p}{text_set["suffix"]}' for p in loaded_labels])
         return labels
 
-    async def respond(self, conversation, message):        
+    async def __limited(self, until):
+        self.debounce[self.last_message.channel.id] = False
+        duration = int(round(until - time.time()))
+        self.rate_limiters[str(self.last_message.channel.id)][1] = until
+        self.rate_limiters[str(self.last_message.channel.id)][2] = True
+        await self.last_message.channel.send(f'<Please wait for {duration} seconds to talk to me!>')
+
+    async def respond(self, conversation, message):
         async with message.channel.typing():
 
             encoded_image_label = ''
@@ -343,6 +357,18 @@ class DiscordBot(Bot):
             if not self.authorized_dm(message):
                 return
 
+        # check if ratelimited
+        self.last_message = message
+        channel_id = str(message.channel.id)
+        if channel_id in self.rate_limiters:
+            if self.last_message != None:
+                if self.rate_limiters[str(self.last_message.channel.id)][1] > time.time():
+                    # ratelimited
+                    await self.__limited(until=self.rate_limiters[channel_id][1])
+                    return
+        else:
+            self.rate_limiters[channel_id] = [AsyncRateLimiter(max_calls=5, period=60.0, callback=self.__limited), time.time()-1, False] #[ratelimiter, until, rate_limited]
+
         if message.channel.id not in self.debounce:
             self.debounce[message.channel.id] = False
 
@@ -352,6 +378,7 @@ class DiscordBot(Bot):
         else:
             logger.info(f'Processing message - ID: {message.id}')
             self.debounce[message.channel.id] = True
+
         try:
             conversation = await self.get_msg_ctx(message.channel)
             if message.guild != None:
@@ -364,7 +391,16 @@ class DiscordBot(Bot):
                     await self.respond(conversation, message)
             else:
                 if self.client.user.mentioned_in(message) or any(t in message_content for t in self.kwargs['nicknames']):
-                    await self.respond(conversation, message)
+                    if (self.kwargs['rate_limit'] == True) and (not self.authorized_dm(message)):
+                        async with self.rate_limiters[channel_id][0]:
+                            if self.rate_limiters[channel_id][2]:
+                                self.rate_limiters[channel_id][2] = False
+                                await self.rate_limiters[channel_id][0].pop_call()
+                                self.debounce[message.channel.id] = False
+                                return
+                            await self.respond(conversation, message)
+                    else:
+                        await self.respond(conversation, message)
                 elif isinstance(message.channel, discord.channel.DMChannel):
                     await self.respond(conversation, message)
         
@@ -387,18 +423,19 @@ class DiscordBot(Bot):
     @tasks.loop(seconds=10)
     async def idle_loop(self):
         await self.client.wait_until_ready()
-        # get last message in a random priority channel
-        priority_channels = self.get_priority_channel(self.kwargs['priority_channel'])
-        channel = self.client.get_channel(random.choice(priority_channels))
-        message = await channel.history(limit=1).flatten()
-        # check if message author is bot
-        if message[0].author.id == self.client.user.id:
-            return
-        if (datetime.datetime.now(datetime.timezone.utc) - message[0].created_at).total_seconds() >= self.kwargs['idle_messaging_interval']:
-            # if it's been more than 5 minutes, send a response
-            conversation = await self.get_msg_ctx(channel)
-            await self.respond(conversation, message[0])
-            logger.info(f'Processed idle response - ID: {message[0].id}')
+        if self.kwargs['idle_messaging_interval'] != None:
+            # get last message in a random priority channel
+            priority_channels = self.get_priority_channel(self.kwargs['priority_channel'])
+            channel = self.client.get_channel(random.choice(priority_channels))
+            message = await channel.history(limit=1).flatten()
+            # check if message author is bot
+            if message[0].author.id == self.client.user.id:
+                return
+            if (datetime.datetime.now(datetime.timezone.utc) - message[0].created_at).total_seconds() >= self.kwargs['idle_messaging_interval']:
+                # if it's been more than 5 minutes, send a response
+                conversation = await self.get_msg_ctx(channel)
+                await self.respond(conversation, message[0])
+                logger.info(f'Processed idle response - ID: {message[0].id}')
 
     def run(self):
         logger.info(f'Starting Discord Bot.')
