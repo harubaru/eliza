@@ -213,7 +213,7 @@ class DiscordBot(Bot):
         duration = int(round(until - time.time()))
         self.rate_limiters[str(self.last_message.channel.id)][1] = until
         self.rate_limiters[str(self.last_message.channel.id)][2] = True
-        await self.last_message.channel.send(f'<Please wait for ``{duration}`` seconds to talk to me! **``This message will delete itself when the cooldown is over.``**>', delete_after=until - time.time())
+        await self.last_message.channel.send(f'<Please wait for ``{duration}`` seconds! **``This message will delete itself when the cooldown is over.``** Don\'t want to wait? Help us pay for server costs so we can keep the AI free! ``discord.gg/touhouai``>', delete_after=until - time.time())
 
     async def respond(self, conversation, message):
         async with message.channel.typing():
@@ -369,7 +369,7 @@ class DiscordBot(Bot):
                         await self.__limited(until=self.rate_limiters[channel_id][1])
                         return
         else:
-            self.rate_limiters[channel_id] = [AsyncRateLimiter(max_calls=5, period=45.0, callback=self.__limited), time.time()-1, False] #[ratelimiter, until, rate_limited]
+            self.rate_limiters[channel_id] = [AsyncRateLimiter(max_calls=5, period=80.0, callback=self.__limited), time.time()-1, False] #[ratelimiter, until, rate_limited]
 
         if message.channel.id not in self.debounce:
             self.debounce[message.channel.id] = False
