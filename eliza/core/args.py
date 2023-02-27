@@ -1,4 +1,4 @@
-from shimeji.model_provider import ModelProvider, Sukima_ModelProvider, ModelGenRequest, ModelGenArgs, ModelSampleArgs, ModelLogitBiasArgs, ModelPhraseBiasArgs
+from shimeji.model_provider import ModelProvider, Sukima_ModelProvider, ModelGenRequest, Enma_ModelProvider, ModelGenArgs, ModelSampleArgs, ModelLogitBiasArgs, ModelPhraseBiasArgs
 from shimeji.memorystore_provider import MemoryStoreProvider, PostgreSQL_MemoryStoreProvider
 from .logging import get_logger
 import argparse
@@ -113,6 +113,34 @@ def get_model_provider(args):
             endpoint_url=args["model_provider"]["endpoint"],
             username=args["model_provider"]["username"],
             password=args["model_provider"]["password"],
+            args=request
+        )
+    #enma code
+    if args["model_provider"]["name"] == "enma":
+        #enma is a LOT more stripped down
+        sample_args = ModelSampleArgs(
+            temp=get_item(args["model_provider"]["gensettings"]["sample_args"], "temp"),
+            top_p=get_item(args["model_provider"]["gensettings"]["sample_args"], "top_p"),
+            top_k=get_item(args["model_provider"]["gensettings"]["sample_args"], "top_k"),
+            rep_p=get_item(args["model_provider"]["gensettings"]["sample_args"], "rep_p"),
+            do_sample=get_item(args["model_provider"]["gensettings"]["sample_args"], "do_sample"),
+            penalty_alpha=get_item(args["model_provider"]["gensettings"]["sample_args"], "penalty_alpha"),
+            num_return_sequences=get_item(args["model_provider"]["gensettings"]["sample_args"], "num_return_sequences"),
+            stop_sequence=get_item(args["model_provider"]["gensettings"]["sample_args"], "stop_sequence"),
+        )
+
+        gen_args = ModelGenArgs(
+            max_length=101,
+        )
+        request = ModelGenRequest(
+            model=args["model_provider"]["gensettings"]["model"],
+            prompt='',
+            sample_args=sample_args,
+            gen_args=gen_args
+        )
+
+        return Enma_ModelProvider(
+            endpoint_url=args["model_provider"]["endpoint"],
             args=request
         )
     else:
