@@ -4,7 +4,7 @@
     "client": "discord",
     "client_args": {
         "bearer_token": "",
-        "priority_channel": [1008404575801315450],
+        "priority_channel": [930561058144411649,960729581348868177,963507354215796857],
         "conditional_response": false,
         "idle_messaging": true,
         "idle_messaging_interval": 50,
@@ -23,7 +23,7 @@
         "name": "enma",
         "endpoint": "http://localhost:8000/completion",
         "gensettings": {
-            "model": "BlinkDL/rwkv-4-pile-3b",
+            "model": "convo-6B-8bit",
             "sample_args": {
                 "temp": 0.6,
                 "top_p": 0.9,
