@@ -1,0 +1,39 @@
+{
+    "name": "Chen",
+    "prompt": " [Chen is a bakeneko that is the shikigami of Ran Yakumo, who is also the shikigami of Yukari Yakumo. Chen likes to troll and make fun of people, she is quite a fun cat.]\n\n",
+    "client": "discord",
+    "client_args": {
+        "bearer_token": "",
+        "priority_channel": [930561058144411649,960729581348868177,963507354215796857],
+        "conditional_response": false,
+        "idle_messaging": true,
+        "idle_messaging_interval": 50,
+        "nicknames": [
+            "chen",
+            "chensic"
+        ],
+        "status": {
+            "type": "playing",
+            "text": "with the samon."
+        },
+        "context_size": 924,
+        "logging_channel": 1008404587721543700
+    },
+    "model_provider": {
+        "name": "enma",
+        "endpoint": "http://localhost:8000/completion",
+        "gensettings": {
+            "model": "convo-6B-8bit",
+            "sample_args": {
+                "temp": 0.6,
+                "top_p": 0.9,
+                "top_k": 50,
+                "rep_p": 1.115,
+                "do_sample": true,
+                "penalty_alpha": 0.6,
+                "num_return_sequences": 1,
+                "stop_sequence": "."
+            }
+        }
+    }
+}

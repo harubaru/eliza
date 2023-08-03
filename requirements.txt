@@ -1,3 +1,3 @@
 tweepy
-git+https://github.com/hitomi-team/shimeji.git
+git+https://github.com/yoinked-h/shimeji.git
 git+https://github.com/Pycord-Development/pycord.git
